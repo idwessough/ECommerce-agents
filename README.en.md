@@ -2,10 +2,9 @@
 
 ## Architecture-First README
 
-This repository contains a Google ADK application exposed as `ecommerce_agents`. Its job is to turn a simple product request into a structured market-analysis report for an e-commerce team.
+This repository contains a Google ADK application `ecommerce_agents`. Its job is to turn a simple product request into a structured market-analysis report for an e-commerce team.
 
-This README is intentionally self-contained for evaluation. It includes the
-architecture rationale, installation and usage steps, API examples, testing
+It includes the architecture rationale, installation and usage steps, API examples, testing
 strategy, a representative generated report, and the written answers to the
 theoretical design questions from the assignment.
 
@@ -44,6 +43,43 @@ The system should automatically:
 - synthesize one final market report
 
 The user should not have to explain how competitor discovery works or how the research should be run. The system should ask a follow-up question only when the product request is genuinely ambiguous.
+
+## Start 
+
+To run the app :
+
+1. Open `docker-compose.yml`.
+2. Go to the shared `x-app-common.environment` section.
+3. Replace:
+
+```text
+GOOGLE_API_KEY: GEMINI_API_KEY_HERE
+```
+
+with a valid Gemini API key.
+
+Important: this line is declared only once under `x-app-common`, so it is
+shared by the web UI, the API container, and the test runner. Reviewers do not
+need to edit any other file to make the app start.
+
+Tr run:
+
+```bash
+docker compose --profile web up --build market-analysis-web
+```
+
+And open:
+
+```text
+http://localhost:8001
+```
+
+If the API key is changed after the first run, recreate the container so the
+new environment value is loaded:
+
+```bash
+docker compose --profile web up -d --build --force-recreate market-analysis-web
+```
 
 ## Product Goal
 
@@ -105,6 +141,41 @@ Aligns well with the ADK documentation:
 - this project still keeps `google_search` isolated in specialist agents as a conservative design choice, even though newer ADK Python versions provide more flexibility than the older integration docs describe
 - the current Gemini API docs document Search grounding support on Gemini 3.1 Pro Preview, so this project now defaults to `gemini-3.1-pro-preview` for live search-grounded research
 
+### Why Google ADK instead of a simpler approach
+
+Choosing Google ADK here is deliberate. The problem is not just to send one
+prompt to a model and return text. The application needs conditional
+clarification, structured shared state, automatic competitor discovery, parallel
+research branches, and the ability to expose the same workflow through both a
+web UI and an API.
+
+Compared with a more hand-rolled Python orchestration layer or a lighter
+single-agent setup, ADK removes a large amount of glue code around:
+
+- routing between agents
+- shared session state
+- event streaming
+- parallel execution
+- exposing the workflow through standard runtime surfaces such as ADK Web and
+  ADK API Server
+
+This is also the more scalable architectural choice for the future of the
+project. If the app evolves, it will be easier:
+
+- to add a new specialist agent without rewriting 
+- to replace one research branch with a dedicated tool or API-backed collector
+- to introduce caching, job queues, or async execution later
+- to preserve a clean separation between orchestration, data collection, and
+  final synthesis
+- to observe behavior at the session, event, and agent-output level
+
+In other words, ADK gives the project better functional scalability: the
+workflow can grow in complexity without turning into a fragile chain of manual
+conditions and model calls. Production scalability will still require the usual
+supporting layers such as stronger persistence, caching, monitoring, and
+possibly async processing, but ADK already provides a cleaner and more
+extensible orchestration foundation than more minimal alternatives.
+
 ### Recommended orchestration pattern
 
 ```text
@@ -125,7 +196,7 @@ This submission implements four specialized tools as modular business components
 - review_sentiment
 - trend_signals
 
-These tools are independently testable and define the structured market-analysis capabilities of the system. The current live ADK runtime is agent-orchestrated: specialist agents use search-grounded research to gather evidence and write structured outputs into session state, while the tool layer provides a stable, deterministic abstraction for testing, validation, and future provider-backed integrations.
+These tools are independently testable and define the structured market-analysis capabilities of the system. The current live ADK runtime is agent-orchestrated: specialist agents use search-grounded research to search evidence and write structured outputs into session state, while the tool layer provides a stable, deterministic abstraction for testing, validation, and future provider-backed integrations.
 
 This is intentional. Agents are responsible for orchestration and end-to-end
 workflow control, while tools represent the reusable specialized analysis
@@ -136,17 +207,17 @@ implementation: agents coordinate the workflow, and tools define the
 specialized functions.
 
 The active ADK runtime is currently agent-first. In the live execution path, the
-specialist agents use `google_search` to gather grounded evidence, while the
+specialist agents use `google_search` to search grounded evidence, while the
 tool layer remains available as the modular capability layer for testing,
 deterministic validation, and future integration with structured e-commerce
 data sources.
 
-The repository still contains local Python functions in `agents/ecommerce_agents/tools.py` and fixture-backed providers in `agents/ecommerce_agents/providers/mock.py`, but those are no longer the primary execution path of the ADK app. The running workflow now uses search-capable specialist agents to gather live evidence and stores their outputs directly in session state.
+The repository still contains local Python functions in `agents/ecommerce_agents/tools.py` and fixture-backed providers in `agents/ecommerce_agents/providers/mock.py`, but those are no longer the primary execution path of the ADK app. The running workflow now uses search-capable specialist agents to search live evidence and stores their outputs directly in session state.
 
 Those local tools still matter for two reasons:
 
 - they provide deterministic structures for unit tests and local fixture-based validation
-- they offer a clean staging point if the project later adds API-backed collectors behind Python function tools
+- they offer a clean staging point if the project later adds API-backed providers behind Python function tools
 
 ### Alternatives considered
 
@@ -643,13 +714,23 @@ The scaffold runs through Docker Compose so the same workflow works on macOS and
 
 ### 1. Runtime environment
 
-For the fastest local run, edit `docker-compose.yml` and replace:
+For the fastest local run, edit `docker-compose.yml` in
+`x-app-common.environment` and replace:
 
 ```text
 GOOGLE_API_KEY: GEMINI_API_KEY_HERE
 ```
 
 with a valid Gemini API key, then rebuild the container.
+
+That declaration is shared by all Compose services, so one change covers:
+
+- `market-analysis-web`
+- `market-analysis-agent`
+- `market-analysis-test`
+
+The important reviewer-facing point is that there is no second config file to
+edit in order to provide the key.
 
 In the compose file, the runtime also supports these optional values:
 
@@ -1147,7 +1228,11 @@ The most useful next steps now that the parallel live-research flow is in place 
 2. Add end-to-end orchestration tests around clarification, competitor discovery, and synthesis.
 3. Decide which research branches should stay search-first and which should move to API-backed collectors.
 4. Add freshness and confidence scoring that the final report can surface explicitly.
-5. Keep the fixture-backed tool layer aligned with the live runtime outputs or retire it if it stops adding value.
+5. Keep the fixture-backed tool layer aligned with the live runtime outputs or retire it if it stops adding value. 
+6. Add an `Agents to UI` layer so the interface delivers clearer business
+   signals, trade-offs, and recommendations and supports more comprehensive
+   decision-making.
+ 
 
 ## Trade-Offs
 
