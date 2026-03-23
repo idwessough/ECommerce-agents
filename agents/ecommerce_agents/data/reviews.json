@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "rating": 5,
+      "text_template": "Customers praise {product_name} for strong performance.",
+      "source": "mock_reviews"
+    },
+    {
+      "rating": 3,
+      "text_template": "Customers mention that {product_name} feels expensive.",
+      "source": "mock_reviews"
+    }
+  ],
+  "sentiment_summary_template": {
+    "top_praise_themes": [
+      "network",
+      "ease_of_use"
+    ],
+    "top_pain_points": [
+      "price"
+    ],
+    "overall_sentiment": "mixed_positive"
+  }
+}

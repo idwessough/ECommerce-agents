@@ -1,0 +1,13 @@
+{
+  "appName": "ecommerce_agents",
+  "userId": "u_123",
+  "sessionId": "s_123",
+  "newMessage": {
+    "role": "user",
+    "parts": [
+      {
+        "text": "Analyze Dyson V15"
+      }
+    ]
+  }
+}

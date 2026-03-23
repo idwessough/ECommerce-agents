@@ -9,7 +9,7 @@ Example input:
 ```json
 {
   "product": "Dyson V15",
-  "market": "US"
+  "market": "CA"
 }
 ```
 
@@ -98,7 +98,7 @@ This design aligns well with the ADK documentation:
 - custom agents are the right fit when orchestration depends on runtime conditions and session state
 - `ParallelAgent` is the right fit when downstream tasks are independent and benefit from concurrency
 - this project still keeps `google_search` isolated in specialist agents as a conservative design choice, even though newer ADK Python versions provide more flexibility than the older integration docs describe
-- the current Gemini API docs document Search grounding support on newer Gemini 3 models, so this project now defaults to `gemini-3-flash-preview` for live search-grounded research
+- the current Gemini API docs document Search grounding support on Gemini 3.1 Pro Preview, so this project now defaults to `gemini-3.1-pro-preview` for live search-grounded research
 
 ### Recommended orchestration pattern
 
@@ -159,6 +159,13 @@ The system relies on explicit state handoffs between stages. The most important 
 | `review_corpus` | `ReviewCorpusAgent` | Review-source evidence and rating/volume signals |
 | `review_sentiment` | `ReviewSentimentAgent` | Praise themes, pain points, and sentiment summary |
 | `trend_signals` | `TrendSignalsAgent` | Category demand and market-trend signals |
+| `final_report` | `MarketAnalysisAgent` | Final Markdown report used for durable persistence and user output |
+
+Completed analyses are also saved to a lightweight SQLite store after the full
+analysis path succeeds. Clarification-only runs are not persisted. The durable
+record keeps request metadata, the final Markdown report, a JSON snapshot of the
+main session-state outputs, and any source URLs that can be extracted from that
+snapshot.
 
 Representative state shapes:
 
@@ -169,7 +176,7 @@ Representative state shapes:
   "canonical_product_name": "Dyson V15 Detect",
   "brand": "Dyson",
   "category": "cordless stick vacuum",
-  "market": "US",
+  "market": "CA",
   "requires_clarification": false,
   "resolution_confidence": 0.93
 }
@@ -463,7 +470,7 @@ Analyze Dyson V15
 - **Language**: Python 3.12
 - **Framework**: Google ADK
 - **App name**: `ecommerce_agents`
-- **Default model**: `gemini-3-flash-preview`
+- **Default model**: `gemini-3.1-pro-preview`
 - **Runtime surfaces**: ADK API Server and ADK Web UI
 - **Local startup target**: Docker Compose on macOS and Windows
 
@@ -478,6 +485,7 @@ The runtime expects these environment variables inside the container:
 - `GOOGLE_API_KEY`
 - `ADK_MODEL`
 - `DEFAULT_MARKET`
+- `ANALYSIS_DB_PATH`
 
 For local development, the preferred place for secrets and overrides is `.env`. A minimal example is already provided in `.env.example`.
 
@@ -485,13 +493,17 @@ Typical local values:
 
 ```text
 GOOGLE_API_KEY=your-google-api-key
-ADK_MODEL=gemini-3-flash-preview
-DEFAULT_MARKET=US
+ADK_MODEL=gemini-3.1-pro-preview
+DEFAULT_MARKET=CA
+ANALYSIS_DB_PATH=/app/.adk/analysis_history.db
 ```
+
+If `ANALYSIS_DB_PATH` is not set, the app defaults to a repo-local SQLite file
+at `.adk/analysis_history.db`.
 
 ### 2. Model selection
 
-The project now defaults to `gemini-3-flash-preview`. The current Gemini API model docs explicitly show Search grounding support for this model, even though the ADK `google_search` integration page still contains older Gemini 2 wording. This repository follows the newer Gemini API model documentation for model compatibility.
+The project now defaults to `gemini-3.1-pro-preview`. As of March 10, 2026, the Gemini API models page deprecates Gemini 3 Pro Preview and points developers to Gemini 3.1 Pro Preview. The dedicated Gemini 3.1 Pro Preview model page, last updated March 18, 2026, lists Search grounding as supported, so this repository uses that newer model for live grounded research.
 
 ### 3. Optional preflight check
 

@@ -1,0 +1,232 @@
+# Test technique - Développeur IA : Agent d'analyse de
+
+# marché e-commerce
+
+## Objectif
+
+Ce test est élaboré pour mettre en lumière votre expertise dans le développement
+d'agents intelligents utilisant des modèles de langage et l'orchestration d'outils. Il
+vise à évaluer votre capacité à concevoir et implémenter des systèmes d'IA
+agentiques complexes.
+
+Nous considérons cet exercice comme le point de départ d'une discussion. **La
+qualité de la réflexion et la clarté de vos justifications sont plus importantes
+que la quantité de fonctionnalités implémentées.**
+
+## Principes directeurs
+
+- **Focus sur l'orchestration :** L'objectif principal est d'évaluer votre capacité à
+    faire collaborer des outils via un agent. La perfection de chaque outil
+    individuel est secondaire.
+- **Clarté avant complexité :** Une solution simple, bien expliquée et robuste
+    est préférable à une solution complexe et inachevée.
+- **Justifiez vos choix :** Le fichier README.md est aussi important que le code.
+    C'est votre espace pour expliquer votre raisonnement.
+
+## Contexte et mise en situation
+
+Nous développons un système d'intelligence de marché pour nos clients e-
+commerce. L'objectif est de leur fournir des analyses de marché automatisées et
+personnalisées basées sur des données en temps réel.
+
+Nous avons identifié le besoin d'un agent intelligent capable d'orchestrer plusieurs
+outils d'analyse pour produire des rapports stratégiques complets sur des produits
+ou marchés spécifiques.
+
+Pour ce projet, vous développerez un agent d'analyse de marché qui utilise
+plusieurs outils spécialisés pour collecter des données produit, analyser la
+concurrence, évaluer le sentiment client, et générer des recommandations
+business.
+
+
+**Important:**
+
+- Créez un nouveau dépôt Git pour votre solution
+- Un fichier README.md doit être fourni pour :
+    o guider l'utilisateur dans l'installation et l'utilisation (étapes 1 à 3)
+    o répondre aux questions théoriques (étapes 4 à 7)
+- Limitez votre travail de programmation aux **étapes 1 à 3** incluses
+- Votre code doit être exécutable et démontrable
+
+## Étapes du test
+
+**1. Setup et architecture de base**
+
+Créez l'architecture fondamentale de votre agent d'analyse de marché :
+
+- **Approche framework** : Choisissez et configurez un framework d'agents
+    (LangGraph, CrewAI, Google ADK, ou autre)
+- **OU approche native** : Implémentez votre propre système d'orchestration
+    directement en Python
+- Implémentez l'agent orchestrateur principal
+- Définissez l'interface API REST pour recevoir les demandes d'analyse
+- Créez la structure modulaire pour les di]érents outils
+- **Containerisez votre solution avec Docker** pour faciliter le déploiement et
+    l'évaluation
+
+_Note: Les deux approches sont acceptées. Justifiez votre choix dans votre
+documentation._
+
+_Design de l'API : Vous êtes libre de concevoir l'interface API qui vous semble la plus
+appropriée pour ce cas d'usage._
+
+**2. Implémentation des outils spécialisés**
+
+Développez au minimum **3 outils** parmi les suivants (vous pouvez utiliser des APIs
+mock ou des données simulées) :
+
+**Outils Suggérés:**
+
+
+- **Web Scraper Tool** : Collecte des prix et informations produit sur di]érentes
+    plateformes
+- **Sentiment Analyzer Tool** : Analyse les avis clients et extrait des insights
+- **Market Trend Analyzer Tool** : Analyse les tendances de prix et de popularité
+- **Report Generator Tool** : Compile les données en rapport structuré avec
+    visualisations
+
+**Attentes qualité:**
+
+L'implémentation doit respecter les standards de production avec une architecture
+modulaire, une gestion appropriée des erreurs, et une facilité de maintenance et
+débogage.
+
+**3. Tests et validation**
+
+Implémentez des tests unitaires couvrant :
+
+- Fonctionnement des outils individuels
+- Orchestration de l'agent principal
+- Gestion des cas d'erreur
+- Validation des outputs
+
+_Choisissez judicieusement des tests essentiels sans exagérer leur nombre._
+
+**4. Architecture de données et stockage**
+
+Détaillez le schéma de données que vous utiliseriez pour :
+
+- Stocker les résultats d'analyse
+- Maintenir l'historique des requêtes
+- Cacher les données collectées
+- Gérer les configurations d'agents
+
+Quel système de stockage recommanderiez-vous et pourquoi? (base de données,
+cache, files, etc.)
+
+**5. Monitoring et observabilité**
+
+Le client souhaite monitorer la santé du système d'agents en production. Expliquez
+votre approche pour :
+
+
+- Tracer l'exécution des agents (tracing)
+- Collecter les métriques de performance
+- Alerter en cas de dysfonctionnement
+- Mesurer la qualité des outputs
+
+Quelles métriques clés surveilleriez-vous?
+
+**6. Scaling et optimisation**
+
+Dessinez et/ou expliquez comment vous procèderiez pour :
+
+- Gérer des pics de charge (100+ analyses simultanées)
+- Optimiser les coûts d'utilisation des LLM
+- Implémenter un système de cache intelligent
+- Paralléliser les tâches d'analyse
+**7. Amélioration continue et A/B testing**
+
+Comment procèderiez-vous pour :
+
+- Évaluer automatiquement la qualité des analyses (LLM as Judge)
+- Comparer di]érentes stratégies de prompt engineering
+- Implémenter un feedback loop utilisateur
+- Faire évoluer les capacités des agents
+
+## Critères d'évaluation
+
+**Architecture agentique (25%)**
+
+- Choix justifié entre framework existant ou implémentation native
+- Design pattern pour l'orchestration des outils
+- Séparation des responsabilités entre composants
+
+**Qualité technique (25%)**
+
+- Code Python propre et maintenable
+- Gestion robuste des erreurs
+- Tests appropriés et couverture
+
+
+**Intégration LLM (25%)**
+
+- Utilisation e]icace des modèles de langage
+- Prompt engineering pour chaque tâche
+- Gestion du contexte et de la mémoire
+
+**Innovation et extensibilité (25%)**
+
+- Features avancées implémentées
+- Architecture extensible
+- Attention aux détails UX/DX
+
+## Livrables attendus
+
+1. **Code source** avec architecture claire et documentation
+2. **README détaillé** avec instructions d'installation et utilisation
+3. **API fonctionnelle** avec exemples de requêtes
+4. **Solution containerisée** (Dockerfile + docker-compose si nécessaire)
+5. **Exemple de rapport** généré par le système
+6. **Réponses documentées** aux questions théoriques (étapes 4-7)
+
+## Trucs et astuces
+
+- Durée estimée : 4-6 heures selon votre expérience
+- Python version recommandée : 3.1 3
+- Vous pouvez utiliser des données mockées pour éviter les blocages API
+- Concentrez-vous sur l'orchestration des agents plutôt que sur la perfection
+    de chaque outil
+- Documentez vos choix techniques et leurs justifications
+- Il est impératif que votre code soit exécutable
+- N'hésitez pas à utiliser des services gratuits ou peu coûteux (OpenAI trial,
+    DeepSeek, OpenRouter, Groq, etc.)
+
+
+## FAQ
+
+**Quel framework d'agents utiliser?**
+
+Vous avez le choix entre :
+
+- **Frameworks existants** : LangGraph, CrewAI, Google ADK, AutoGen, etc.
+- **Implémentation native** : Développer votre propre système d'orchestration
+    en Python
+
+L'important est de justifier votre choix et de démontrer votre maîtrise de
+l'orchestration d'agents. Une solution native bien conçue peut être tout aussi
+valorisée qu'un framework établi.
+
+**Comment gérer les APIs payantes?**
+
+Vous avez plusieurs options :
+
+- **Services gratuits/peu coûteux** : DeepSeek, OpenRouter, Groq, Ollama
+    local, comptes trial OpenAI/Anthropic
+- **APIs mock** ou données simulées pour les démonstrations
+
+L'important est de démontrer l'architecture et les patterns, pas de dépenser de
+l'argent.
+
+**Comment tester le système?**
+
+Créez des exemples concrets avec des produits réels (iPhone, Nike Air Max, etc.) et
+montrez les rapports générés. Vous pouvez utiliser des données simulées si
+nécessaire.
+
+**Faut-il déployer en production?**
+
+Non, une démonstration locale est su]isante. La solution doit être containerisée
+avec Docker pour faciliter l'évaluation et garantir la reproductibilité.
+
+

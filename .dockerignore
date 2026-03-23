@@ -1,0 +1,10 @@
+.git
+.gitignore
+.venv
+__pycache__
+.pytest_cache
+.uv-cache
+.env
+mcpdoc-health.err.log
+mcpdoc-health.out.log
+# Test technique - Développeur IA.txt
