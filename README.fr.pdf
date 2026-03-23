@@ -1,0 +1,4424 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Length 2756 >>
+stream
+BT
+/F2 18 Tf
+1 0 0 1 54 738 Tm
+(ECommerce Agents) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 682 Tm
+(Architecture) Tj
+/F1 10 Tf
+1 0 0 1 54 662 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 648 Tm
+(Ce dépôt contient une application Google ADK exposée sous le nom) Tj
+/F1 10 Tf
+1 0 0 1 54 634 Tm
+(`ecommerce_agents`. Son objectif est de transformer une demande produit simple) Tj
+/F1 10 Tf
+1 0 0 1 54 620 Tm
+(en un rapport structuré d'analyse de marché pour une équipe e-commerce.) Tj
+/F1 10 Tf
+1 0 0 1 54 606 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 592 Tm
+(Ce README est volontairement autonome pour l'évaluation. Il regroupe la) Tj
+/F1 10 Tf
+1 0 0 1 54 578 Tm
+(justification d'architecture, les étapes d'installation et d'utilisation, des) Tj
+/F1 10 Tf
+1 0 0 1 54 564 Tm
+(exemples d'API, la stratégie de test, un exemple représentatif de rapport) Tj
+/F1 10 Tf
+1 0 0 1 54 550 Tm
+(généré, ainsi que les réponses rédigées aux questions théoriques du test.) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+(Exemple d'entrée :) Tj
+/F1 10 Tf
+1 0 0 1 54 508 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 494 Tm
+([json]) Tj
+/F1 10 Tf
+1 0 0 1 66 480 Tm
+({) Tj
+/F1 10 Tf
+1 0 0 1 66 466 Tm
+(  "product": "Dyson V15",) Tj
+/F1 10 Tf
+1 0 0 1 66 452 Tm
+(  "market": "CA") Tj
+/F1 10 Tf
+1 0 0 1 66 438 Tm
+(}) Tj
+/F1 10 Tf
+1 0 0 1 54 424 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 410 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 396 Tm
+(ou simplement :) Tj
+/F1 10 Tf
+1 0 0 1 54 382 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 368 Tm
+([text]) Tj
+/F1 10 Tf
+1 0 0 1 66 354 Tm
+(Analyze Dyson V15) Tj
+/F1 10 Tf
+1 0 0 1 54 340 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 326 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 312 Tm
+(Le flux d'exécution actif est le suivant :) Tj
+/F1 10 Tf
+1 0 0 1 54 298 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 284 Tm
+([text]) Tj
+/F1 10 Tf
+1 0 0 1 66 270 Tm
+(MarketAnalysisOrchestrator) Tj
+/F1 10 Tf
+1 0 0 1 66 256 Tm
+(  -> ResearchScopeAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 242 Tm
+(  -> ClarificationAgent \(only if needed\)) Tj
+/F1 10 Tf
+1 0 0 1 66 228 Tm
+(  -> CompetitorDiscoveryAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 214 Tm
+(  -> ParallelMarketResearchAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 200 Tm
+(  -> MarketAnalysisAgent) Tj
+/F1 10 Tf
+1 0 0 1 54 186 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 172 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 158 Tm
+(Le système doit automatiquement :) Tj
+/F1 10 Tf
+1 0 0 1 54 144 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 130 Tm
+(• normaliser le nom du produit) Tj
+/F1 10 Tf
+1 0 0 1 54 116 Tm
+(• déduire la marque, la catégorie et le marché cible) Tj
+/F1 10 Tf
+1 0 0 1 54 102 Tm
+(• découvrir les concurrents les plus pertinents) Tj
+/F1 10 Tf
+1 0 0 1 54 88 Tm
+(• collecter des signaux en direct de prix, d'avis, de sentiment et de tendance) Tj
+/F1 10 Tf
+1 0 0 1 54 74 Tm
+(• synthétiser un rapport final d'analyse de marché) Tj
+ET
+endstream
+endobj
+4 0 obj
+<< /Length 3165 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(L'utilisateur ne doit pas avoir à expliquer comment fonctionne la découverte des) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(concurrents ni comment la recherche doit être conduite. Le système ne doit) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(poser une question complémentaire que lorsque la demande produit est réellement) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(ambiguë.) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 654 Tm
+(Objectif produit) Tj
+/F1 10 Tf
+1 0 0 1 54 634 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 620 Tm
+(L'objectif est de construire un assistant d'intelligence de marché pour des) Tj
+/F1 10 Tf
+1 0 0 1 54 606 Tm
+(équipes e-commerce. À partir d'un nom de produit, le système doit produire un) Tj
+/F1 10 Tf
+1 0 0 1 54 592 Tm
+(rapport métier utile couvrant :) Tj
+/F1 10 Tf
+1 0 0 1 54 578 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 564 Tm
+(• le positionnement produit) Tj
+/F1 10 Tf
+1 0 0 1 54 550 Tm
+(• les concurrents probables) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+(• les signaux de prix et d'offre) Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+(• le sentiment client) Tj
+/F1 10 Tf
+1 0 0 1 54 508 Tm
+(• les tendances de marché) Tj
+/F1 10 Tf
+1 0 0 1 54 494 Tm
+(• des recommandations actionnables) Tj
+/F1 10 Tf
+1 0 0 1 54 480 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 466 Tm
+(Cette architecture privilégie :) Tj
+/F1 10 Tf
+1 0 0 1 54 452 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 438 Tm
+(• une expérience utilisateur simple) Tj
+/F1 10 Tf
+1 0 0 1 54 424 Tm
+(• une orchestration prévisible) Tj
+/F1 10 Tf
+1 0 0 1 54 410 Tm
+(• des transferts d'état explicites entre les étapes) Tj
+/F1 10 Tf
+1 0 0 1 54 396 Tm
+(• une facilité de test et d'inspection) Tj
+/F1 10 Tf
+1 0 0 1 54 382 Tm
+(• une extensibilité vers de futurs collecteurs connectés à des API) Tj
+/F1 10 Tf
+1 0 0 1 54 368 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 354 Tm
+(Expérience utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 334 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 320 Tm
+(Le parcours utilisateur visé est volontairement minimal :) Tj
+/F1 10 Tf
+1 0 0 1 54 306 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 292 Tm
+(1. L'utilisateur soumet un nom de produit.) Tj
+/F1 10 Tf
+1 0 0 1 54 278 Tm
+(2. Le système résout le produit exact et le contexte marché.) Tj
+/F1 10 Tf
+1 0 0 1 54 264 Tm
+(3. Le système pose une seule question courte de clarification si la demande est) Tj
+/F1 10 Tf
+1 0 0 1 54 250 Tm
+(   floue.) Tj
+/F1 10 Tf
+1 0 0 1 54 236 Tm
+(4. Le système découvre automatiquement les concurrents.) Tj
+/F1 10 Tf
+1 0 0 1 54 222 Tm
+(5. Le système exécute une recherche de marché en direct.) Tj
+/F1 10 Tf
+1 0 0 1 54 208 Tm
+(6. L'utilisateur reçoit un rapport final unique.) Tj
+/F1 10 Tf
+1 0 0 1 54 194 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 180 Tm
+(Exemples :) Tj
+/F1 10 Tf
+1 0 0 1 54 166 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 152 Tm
+(• `Analyze Dyson V15` -> probablement pas de clarification nécessaire) Tj
+/F1 10 Tf
+1 0 0 1 54 138 Tm
+(• `Analyze AirPods` -> une clarification peut être nécessaire car plusieurs modèles) Tj
+/F1 10 Tf
+1 0 0 1 54 124 Tm
+(  existent) Tj
+/F1 10 Tf
+1 0 0 1 54 110 Tm
+(• `Hello` -> le système doit demander quel produit l'utilisateur souhaite analyser) Tj
+/F1 10 Tf
+1 0 0 1 54 96 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 82 Tm
+(Architecture recommandée) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Length 3438 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 724 Tm
+(Décision) Tj
+/F1 10 Tf
+1 0 0 1 54 706 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 692 Tm
+(La solution recommandée actuellement est un petit système multi-agents ADK avec) Tj
+/F1 10 Tf
+1 0 0 1 54 678 Tm
+(branchement explicite et une étape de recherche parallèle en direct.) Tj
+/F1 10 Tf
+1 0 0 1 54 664 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 650 Tm
+(Pourquoi cette architecture) Tj
+/F1 10 Tf
+1 0 0 1 54 632 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 618 Tm
+(L'implémentation actuelle suit les patterns ADK qui correspondent le mieux au) Tj
+/F1 10 Tf
+1 0 0 1 54 604 Tm
+(problème :) Tj
+/F1 10 Tf
+1 0 0 1 54 590 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 576 Tm
+(• un orchestrateur personnalisé basé sur `BaseAgent` pour le contrôle) Tj
+/F1 10 Tf
+1 0 0 1 54 562 Tm
+(  conditionnel du flux) Tj
+/F1 10 Tf
+1 0 0 1 54 548 Tm
+(• un `ResearchScopeAgent` capable d'utiliser la recherche pour résoudre la) Tj
+/F1 10 Tf
+1 0 0 1 54 534 Tm
+(  demande en état structuré) Tj
+/F1 10 Tf
+1 0 0 1 54 520 Tm
+(• un `ClarificationAgent` dédié pour poser une seule question de suivi lorsque) Tj
+/F1 10 Tf
+1 0 0 1 54 506 Tm
+(  le périmètre est ambigu) Tj
+/F1 10 Tf
+1 0 0 1 54 492 Tm
+(• un `CompetitorDiscoveryAgent` capable d'utiliser la recherche et de dériver) Tj
+/F1 10 Tf
+1 0 0 1 54 478 Tm
+(  ses propres requêtes à partir du périmètre résolu) Tj
+/F1 10 Tf
+1 0 0 1 54 464 Tm
+(• un `ParallelAgent` de workflow qui exécute des branches de recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 450 Tm
+(  indépendantes en concurrence) Tj
+/F1 10 Tf
+1 0 0 1 54 436 Tm
+(• un agent final de synthèse qui rédige le rapport utilisateur à partir de) Tj
+/F1 10 Tf
+1 0 0 1 54 422 Tm
+(  l'état de session) Tj
+/F1 10 Tf
+1 0 0 1 54 408 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 394 Tm
+(Cette approche s'aligne bien avec la documentation ADK :) Tj
+/F1 10 Tf
+1 0 0 1 54 380 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 366 Tm
+(• les agents personnalisés sont le bon choix lorsque l'orchestration dépend de) Tj
+/F1 10 Tf
+1 0 0 1 54 352 Tm
+(  conditions d'exécution et de l'état de session) Tj
+/F1 10 Tf
+1 0 0 1 54 338 Tm
+(• `ParallelAgent` est le bon choix lorsque les tâches aval sont indépendantes et) Tj
+/F1 10 Tf
+1 0 0 1 54 324 Tm
+(  bénéficient de la concurrence) Tj
+/F1 10 Tf
+1 0 0 1 54 310 Tm
+(• ce projet garde encore `google_search` isolé dans des agents spécialisés) Tj
+/F1 10 Tf
+1 0 0 1 54 296 Tm
+(  comme choix conservateur, même si les versions récentes d'ADK Python offrent) Tj
+/F1 10 Tf
+1 0 0 1 54 282 Tm
+(  davantage de flexibilité que les anciennes intégrations) Tj
+/F1 10 Tf
+1 0 0 1 54 268 Tm
+(• la documentation actuelle de l'API Gemini indique que Search grounding est) Tj
+/F1 10 Tf
+1 0 0 1 54 254 Tm
+(  supporté par Gemini 3.1 Pro Preview, c'est pourquoi le projet utilise par) Tj
+/F1 10 Tf
+1 0 0 1 54 240 Tm
+(  défaut `gemini-3.1-pro-preview` pour la recherche en direct ancrée sur le web) Tj
+/F1 10 Tf
+1 0 0 1 54 226 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 212 Tm
+(Pattern d'orchestration recommandé) Tj
+/F1 10 Tf
+1 0 0 1 54 194 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 180 Tm
+([text]) Tj
+/F1 10 Tf
+1 0 0 1 66 166 Tm
+(MarketAnalysisOrchestrator\() Tj
+/F1 10 Tf
+1 0 0 1 66 152 Tm
+(  ResearchScope) Tj
+/F1 10 Tf
+1 0 0 1 66 138 Tm
+(  -> Clarification if needed) Tj
+/F1 10 Tf
+1 0 0 1 66 124 Tm
+(  -> Competitor Discovery) Tj
+/F1 10 Tf
+1 0 0 1 66 110 Tm
+(  -> Parallel Market Research) Tj
+/F1 10 Tf
+1 0 0 1 66 96 Tm
+(  -> Final Analysis) Tj
+/F1 10 Tf
+1 0 0 1 66 82 Tm
+(\)) Tj
+/F1 10 Tf
+1 0 0 1 54 68 Tm
+() Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Length 3854 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 724 Tm
+(Couche d'outils spécialisée) Tj
+/F1 10 Tf
+1 0 0 1 54 704 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 690 Tm
+(Cette soumission implémente quatre outils spécialisés sous forme de composants) Tj
+/F1 10 Tf
+1 0 0 1 54 676 Tm
+(métier modulaires :) Tj
+/F1 10 Tf
+1 0 0 1 54 662 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 648 Tm
+(• `pricing_intelligence`) Tj
+/F1 10 Tf
+1 0 0 1 54 634 Tm
+(• `review_corpus`) Tj
+/F1 10 Tf
+1 0 0 1 54 620 Tm
+(• `review_sentiment`) Tj
+/F1 10 Tf
+1 0 0 1 54 606 Tm
+(• `trend_signals`) Tj
+/F1 10 Tf
+1 0 0 1 54 592 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 578 Tm
+(Ces outils sont testables indépendamment et définissent les capacités) Tj
+/F1 10 Tf
+1 0 0 1 54 564 Tm
+(structurées d'analyse de marché du système. Le runtime ADK actif est piloté par) Tj
+/F1 10 Tf
+1 0 0 1 54 550 Tm
+(des agents : des agents spécialisés utilisent une recherche ancrée sur le web) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+(pour collecter des preuves et écrire des sorties structurées dans l'état de) Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+(session, tandis que la couche d'outils fournit une abstraction stable et) Tj
+/F1 10 Tf
+1 0 0 1 54 508 Tm
+(déterministe pour les tests, la validation, et de futures intégrations avec des) Tj
+/F1 10 Tf
+1 0 0 1 54 494 Tm
+(fournisseurs de données plus structurés.) Tj
+/F1 10 Tf
+1 0 0 1 54 480 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 466 Tm
+(Ce choix est intentionnel. Les agents portent l'orchestration et le contrôle) Tj
+/F1 10 Tf
+1 0 0 1 54 452 Tm
+(de bout en bout du workflow, tandis que les outils représentent les capacités) Tj
+/F1 10 Tf
+1 0 0 1 54 438 Tm
+(spécialisées réutilisables exigées par le test.) Tj
+/F1 10 Tf
+1 0 0 1 54 424 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 410 Tm
+(Autrement dit, l'architecture sépare l'orchestration de l'implémentation des) Tj
+/F1 10 Tf
+1 0 0 1 54 396 Tm
+(capacités : les agents coordonnent le workflow, et les outils définissent les) Tj
+/F1 10 Tf
+1 0 0 1 54 382 Tm
+(fonctions spécialisées.) Tj
+/F1 10 Tf
+1 0 0 1 54 368 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 354 Tm
+(Le runtime ADK actif est aujourd'hui orienté agents. Dans le chemin) Tj
+/F1 10 Tf
+1 0 0 1 54 340 Tm
+(d'exécution en direct, les agents spécialisés utilisent `google_search` pour) Tj
+/F1 10 Tf
+1 0 0 1 54 326 Tm
+(collecter des preuves ancrées, tandis que la couche d'outils reste disponible) Tj
+/F1 10 Tf
+1 0 0 1 54 312 Tm
+(comme couche modulaire de capacités pour les tests, la validation) Tj
+/F1 10 Tf
+1 0 0 1 54 298 Tm
+(déterministe, et une future intégration avec des sources de données e-commerce) Tj
+/F1 10 Tf
+1 0 0 1 54 284 Tm
+(structurées.) Tj
+/F1 10 Tf
+1 0 0 1 54 270 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 256 Tm
+(Le dépôt contient toujours des fonctions Python locales dans) Tj
+/F1 10 Tf
+1 0 0 1 54 242 Tm
+(`agents/ecommerce_agents/tools.py` ainsi que des providers alimentés par des) Tj
+/F1 10 Tf
+1 0 0 1 54 228 Tm
+(fixtures dans `agents/ecommerce_agents/providers/mock.py`, mais ils ne) Tj
+/F1 10 Tf
+1 0 0 1 54 214 Tm
+(constituent plus aujourd'hui le chemin principal d'exécution de l'application) Tj
+/F1 10 Tf
+1 0 0 1 54 200 Tm
+(ADK. Le workflow en cours utilise des agents spécialisés capables de faire des) Tj
+/F1 10 Tf
+1 0 0 1 54 186 Tm
+(recherches pour collecter des preuves en direct et stocker leurs sorties) Tj
+/F1 10 Tf
+1 0 0 1 54 172 Tm
+(directement dans l'état de session.) Tj
+/F1 10 Tf
+1 0 0 1 54 158 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 144 Tm
+(Ces outils locaux restent importants pour deux raisons :) Tj
+/F1 10 Tf
+1 0 0 1 54 130 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 116 Tm
+(• ils fournissent des structures déterministes pour les tests unitaires et la) Tj
+/F1 10 Tf
+1 0 0 1 54 102 Tm
+(  validation locale à partir de fixtures) Tj
+/F1 10 Tf
+1 0 0 1 54 88 Tm
+(• ils offrent un point d'extension propre si le projet ajoute plus tard des) Tj
+/F1 10 Tf
+1 0 0 1 54 74 Tm
+(  collecteurs basés sur des API derrière des outils Python) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Length 3654 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 724 Tm
+(Alternatives étudiées) Tj
+/F1 10 Tf
+1 0 0 1 54 706 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 692 Tm
+(• **Agent unique** : plus simple en apparence, mais moins bon pour contrôler la) Tj
+/F1 10 Tf
+1 0 0 1 54 678 Tm
+(  clarification, le cadrage et la découverte de concurrents ancrée sur des) Tj
+/F1 10 Tf
+1 0 0 1 54 664 Tm
+(  données.) Tj
+/F1 10 Tf
+1 0 0 1 54 650 Tm
+(• **Seulement des workflow agents** : insuffisant, car l'application a besoin) Tj
+/F1 10 Tf
+1 0 0 1 54 636 Tm
+(  d'un branchement explicite basé sur `research_scope` et sur les règles de) Tj
+/F1 10 Tf
+1 0 0 1 54 622 Tm
+(  clarification.) Tj
+/F1 10 Tf
+1 0 0 1 54 608 Tm
+(• **Beaucoup plus d'agents spécialisés** : possible, mais inutile au-delà du) Tj
+/F1 10 Tf
+1 0 0 1 54 594 Tm
+(  découpage actuel de la recherche en direct.) Tj
+/F1 10 Tf
+1 0 0 1 54 580 Tm
+(• **Recherche uniquement via fonctions-outils** : intéressant pour des) Tj
+/F1 10 Tf
+1 0 0 1 54 566 Tm
+(  intégrations déterministes plus tard, mais ce n'est pas l'architecture active) Tj
+/F1 10 Tf
+1 0 0 1 54 552 Tm
+(  du runtime aujourd'hui.) Tj
+/F1 10 Tf
+1 0 0 1 54 538 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 524 Tm
+(Couverture des livrables) Tj
+/F1 10 Tf
+1 0 0 1 54 504 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 490 Tm
+(Le test demande l'implémentation en code des étapes 1 à 3 et des réponses) Tj
+/F1 10 Tf
+1 0 0 1 54 476 Tm
+(rédigées dans le README pour les étapes 4 à 7. Le dépôt actuel est structuré de) Tj
+/F1 10 Tf
+1 0 0 1 54 462 Tm
+(cette manière :) Tj
+/F1 10 Tf
+1 0 0 1 54 448 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 434 Tm
+(Exigence | Solution actuelle) Tj
+/F1 10 Tf
+1 0 0 1 54 420 Tm
+(--- | ---) Tj
+/F1 10 Tf
+1 0 0 1 54 406 Tm
+(Framework ou orchestration native | Google ADK avec un orchestrateur personnalisé basé) Tj
+/F1 10 Tf
+1 0 0 1 54 392 Tm
+(sur `BaseAgent`) Tj
+/F1 10 Tf
+1 0 0 1 54 378 Tm
+(Orchestrateur principal | `MarketAnalysisOrchestrator`) Tj
+/F1 10 Tf
+1 0 0 1 54 364 Tm
+(Outils modulaires | `pricing_intelligence`, `review_corpus`, `review_sentiment`,) Tj
+/F1 10 Tf
+1 0 0 1 54 350 Tm
+(`trend_signals`) Tj
+/F1 10 Tf
+1 0 0 1 54 336 Tm
+(API REST | Serveur API ADK sur `http://localhost:8000`) Tj
+/F1 10 Tf
+1 0 0 1 54 322 Tm
+(Containerisation | `Dockerfile` et `docker-compose.yml`) Tj
+/F1 10 Tf
+1 0 0 1 54 308 Tm
+(Tests | Tests unitaires pour les outils, le routage, l'orchestration, le stockage et la) Tj
+/F1 10 Tf
+1 0 0 1 54 294 Tm
+(gestion d'erreurs) Tj
+/F1 10 Tf
+1 0 0 1 54 280 Tm
+(Exemple de rapport | Inclus plus bas dans ce README) Tj
+/F1 10 Tf
+1 0 0 1 54 266 Tm
+(Réponses théoriques aux étapes 4 à 7 | Incluses plus bas dans ce README) Tj
+/F1 10 Tf
+1 0 0 1 54 252 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 238 Tm
+(Le code se concentre volontairement sur les étapes 1 à 3 de l'exercice. Les) Tj
+/F1 10 Tf
+1 0 0 1 54 224 Tm
+(sections plus bas dans ce README pour les étapes 4 à 7 doivent être lues comme) Tj
+/F1 10 Tf
+1 0 0 1 54 210 Tm
+(des recommandations de conception et de production, et non comme des) Tj
+/F1 10 Tf
+1 0 0 1 54 196 Tm
+(affirmations indiquant que ces capacités sont déjà intégralement implémentées) Tj
+/F1 10 Tf
+1 0 0 1 54 182 Tm
+(dans le code actuel.) Tj
+/F1 10 Tf
+1 0 0 1 54 168 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 154 Tm
+(Composants de haut niveau) Tj
+/F1 10 Tf
+1 0 0 1 54 134 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 120 Tm
+(Composant | Type ADK | Responsabilité | Sortie principale) Tj
+/F1 10 Tf
+1 0 0 1 54 106 Tm
+(--- | --- | --- | ---) Tj
+/F1 10 Tf
+1 0 0 1 54 92 Tm
+(`MarketAnalysisOrchestrator` | `BaseAgent` personnalisé | Coordonne la résolution du) Tj
+/F1 10 Tf
+1 0 0 1 54 78 Tm
+(périmètre, la clarification, la découverte de concurrents, la recherche parallèle et la) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Length 4324 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(synthèse finale | rapport final) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(`ResearchScopeAgent` | `LlmAgent` avec `google_search` | Résout la demande utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(en périmètre structuré et signale si une clarification est nécessaire | `research_scope`) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(`ClarificationAgent` | `LlmAgent` | Pose une seule question courte de suivi lorsque la) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(demande n'est pas claire | clarification utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+(`CompetitorDiscoveryAgent` | `LlmAgent` avec `google_search` | Trouve les concurrents) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+(les plus pertinents pour le produit résolu | `competitor_set`) Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+(`ParallelMarketResearchAgent` | `ParallelAgent` de workflow | Exécute en concurrence la) Tj
+/F1 10 Tf
+1 0 0 1 54 626 Tm
+(recherche sur les prix, les avis, le sentiment et les tendances | sorties de branches) Tj
+/F1 10 Tf
+1 0 0 1 54 612 Tm
+(dans l'état de session) Tj
+/F1 10 Tf
+1 0 0 1 54 598 Tm
+(`PricingIntelligenceAgent` | `LlmAgent` avec `google_search` | Recherche des signaux de) Tj
+/F1 10 Tf
+1 0 0 1 54 584 Tm
+(prix en direct pour le produit principal et ses concurrents | `pricing_intelligence`) Tj
+/F1 10 Tf
+1 0 0 1 54 570 Tm
+(`ReviewCorpusAgent` | `LlmAgent` avec `google_search` | Recherche des sources d'avis et) Tj
+/F1 10 Tf
+1 0 0 1 54 556 Tm
+(de preuves liées au produit principal et aux concurrents | `review_corpus`) Tj
+/F1 10 Tf
+1 0 0 1 54 542 Tm
+(`ReviewSentimentAgent` | `LlmAgent` avec `google_search` | Recherche les thèmes) Tj
+/F1 10 Tf
+1 0 0 1 54 528 Tm
+(positifs, les irritants et les signaux de sentiment | `review_sentiment`) Tj
+/F1 10 Tf
+1 0 0 1 54 514 Tm
+(`TrendSignalsAgent` | `LlmAgent` avec `google_search` | Recherche des signaux de demande) Tj
+/F1 10 Tf
+1 0 0 1 54 500 Tm
+(et de tendance de catégorie | `trend_signals`) Tj
+/F1 10 Tf
+1 0 0 1 54 486 Tm
+(`MarketAnalysisAgent` | `LlmAgent` | Synthétise l'état collecté en rapport final) Tj
+/F1 10 Tf
+1 0 0 1 54 472 Tm
+(Markdown | rapport final en Markdown) Tj
+/F1 10 Tf
+1 0 0 1 54 458 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 444 Tm
+(Le nom d'application servi par ADK est `ecommerce_agents`, et `root_agent`) Tj
+/F1 10 Tf
+1 0 0 1 54 430 Tm
+(exporte l'orchestrateur.) Tj
+/F1 10 Tf
+1 0 0 1 54 416 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 402 Tm
+(Contrats d'état de session) Tj
+/F1 10 Tf
+1 0 0 1 54 382 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 368 Tm
+(Le système repose sur des transferts d'état explicites entre les étapes. Les) Tj
+/F1 10 Tf
+1 0 0 1 54 354 Tm
+(clés d'état de session les plus importantes sont :) Tj
+/F1 10 Tf
+1 0 0 1 54 340 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 326 Tm
+(Clé d'état | Produite par | Rôle) Tj
+/F1 10 Tf
+1 0 0 1 54 312 Tm
+(--- | --- | ---) Tj
+/F1 10 Tf
+1 0 0 1 54 298 Tm
+(`research_scope` | `ResearchScopeAgent` | Périmètre produit normalisé utilisé pour le) Tj
+/F1 10 Tf
+1 0 0 1 54 284 Tm
+(routage et les prompts aval) Tj
+/F1 10 Tf
+1 0 0 1 54 270 Tm
+(`competitor_set` | `CompetitorDiscoveryAgent` | Liste structurée des concurrents) Tj
+/F1 10 Tf
+1 0 0 1 54 256 Tm
+(utilisée par toutes les branches de recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 242 Tm
+(`pricing_intelligence` | `PricingIntelligenceAgent` | Preuves de prix en direct pour le) Tj
+/F1 10 Tf
+1 0 0 1 54 228 Tm
+(produit et ses concurrents) Tj
+/F1 10 Tf
+1 0 0 1 54 214 Tm
+(`review_corpus` | `ReviewCorpusAgent` | Preuves issues des avis, notes et volumes) Tj
+/F1 10 Tf
+1 0 0 1 54 200 Tm
+(`review_sentiment` | `ReviewSentimentAgent` | Thèmes positifs, points de douleur et) Tj
+/F1 10 Tf
+1 0 0 1 54 186 Tm
+(synthèse de sentiment) Tj
+/F1 10 Tf
+1 0 0 1 54 172 Tm
+(`trend_signals` | `TrendSignalsAgent` | Signaux de demande de catégorie et tendances) Tj
+/F1 10 Tf
+1 0 0 1 54 158 Tm
+(marché) Tj
+/F1 10 Tf
+1 0 0 1 54 144 Tm
+(`final_report` | `MarketAnalysisAgent` | Rapport final Markdown utilisé pour la) Tj
+/F1 10 Tf
+1 0 0 1 54 130 Tm
+(persistance durable et la sortie utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 116 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 102 Tm
+(Les analyses terminées sont également enregistrées dans un stockage SQLite) Tj
+/F1 10 Tf
+1 0 0 1 54 88 Tm
+(léger une fois que le chemin d'analyse complet réussit. Les exécutions qui se) Tj
+/F1 10 Tf
+1 0 0 1 54 74 Tm
+(limitent à une clarification ne sont pas persistées. L'enregistrement durable) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Length 2477 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(conserve les métadonnées de requête, le rapport final Markdown, un snapshot JSON) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(des principales sorties d'état de session et toutes les URL sources qui peuvent) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(être extraites de ce snapshot.) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(Exemples représentatifs de formes d'état :) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 654 Tm
+(Exemple `research_scope`) Tj
+/F1 10 Tf
+1 0 0 1 54 636 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 622 Tm
+([json]) Tj
+/F1 10 Tf
+1 0 0 1 66 608 Tm
+({) Tj
+/F1 10 Tf
+1 0 0 1 66 594 Tm
+(  "canonical_product_name": "Dyson V15 Detect",) Tj
+/F1 10 Tf
+1 0 0 1 66 580 Tm
+(  "brand": "Dyson",) Tj
+/F1 10 Tf
+1 0 0 1 66 566 Tm
+(  "category": "cordless stick vacuum",) Tj
+/F1 10 Tf
+1 0 0 1 66 552 Tm
+(  "market": "CA",) Tj
+/F1 10 Tf
+1 0 0 1 66 538 Tm
+(  "requires_clarification": false,) Tj
+/F1 10 Tf
+1 0 0 1 66 524 Tm
+(  "resolution_confidence": 0.93) Tj
+/F1 10 Tf
+1 0 0 1 66 510 Tm
+(}) Tj
+/F1 10 Tf
+1 0 0 1 54 496 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 482 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 468 Tm
+(Exemple `competitor_set`) Tj
+/F1 10 Tf
+1 0 0 1 54 450 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 436 Tm
+([json]) Tj
+/F1 10 Tf
+1 0 0 1 66 422 Tm
+({) Tj
+/F1 10 Tf
+1 0 0 1 66 408 Tm
+(  "primary_product": "Dyson V15 Detect",) Tj
+/F1 10 Tf
+1 0 0 1 66 394 Tm
+(  "competitors": [) Tj
+/F1 10 Tf
+1 0 0 1 66 380 Tm
+(    {) Tj
+/F1 10 Tf
+1 0 0 1 66 366 Tm
+(      "brand": "Shark",) Tj
+/F1 10 Tf
+1 0 0 1 66 352 Tm
+(      "model": "Detect Pro",) Tj
+/F1 10 Tf
+1 0 0 1 66 338 Tm
+(      "confidence": 0.91) Tj
+/F1 10 Tf
+1 0 0 1 66 324 Tm
+(    },) Tj
+/F1 10 Tf
+1 0 0 1 66 310 Tm
+(    {) Tj
+/F1 10 Tf
+1 0 0 1 66 296 Tm
+(      "brand": "Tineco",) Tj
+/F1 10 Tf
+1 0 0 1 66 282 Tm
+(      "model": "Pure One S15",) Tj
+/F1 10 Tf
+1 0 0 1 66 268 Tm
+(      "confidence": 0.88) Tj
+/F1 10 Tf
+1 0 0 1 66 254 Tm
+(    },) Tj
+/F1 10 Tf
+1 0 0 1 66 240 Tm
+(    {) Tj
+/F1 10 Tf
+1 0 0 1 66 226 Tm
+(      "brand": "Samsung",) Tj
+/F1 10 Tf
+1 0 0 1 66 212 Tm
+(      "model": "Bespoke Jet",) Tj
+/F1 10 Tf
+1 0 0 1 66 198 Tm
+(      "confidence": 0.82) Tj
+/F1 10 Tf
+1 0 0 1 66 184 Tm
+(    }) Tj
+/F1 10 Tf
+1 0 0 1 66 170 Tm
+(  ]) Tj
+/F1 10 Tf
+1 0 0 1 66 156 Tm
+(}) Tj
+/F1 10 Tf
+1 0 0 1 54 142 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 128 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 114 Tm
+(Exemple `pricing_intelligence`) Tj
+/F1 10 Tf
+1 0 0 1 54 96 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 82 Tm
+([json]) Tj
+/F1 10 Tf
+1 0 0 1 66 68 Tm
+({) Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Length 3091 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 66 738 Tm
+(  "currency": "USD",) Tj
+/F1 10 Tf
+1 0 0 1 66 724 Tm
+(  "primary_product": "Dyson V15 Detect",) Tj
+/F1 10 Tf
+1 0 0 1 66 710 Tm
+(  "products": [) Tj
+/F1 10 Tf
+1 0 0 1 66 696 Tm
+(    {) Tj
+/F1 10 Tf
+1 0 0 1 66 682 Tm
+(      "product": "Dyson V15 Detect",) Tj
+/F1 10 Tf
+1 0 0 1 66 668 Tm
+(      "msrp_when_found": {) Tj
+/F1 10 Tf
+1 0 0 1 66 654 Tm
+(        "amount": 749.99,) Tj
+/F1 10 Tf
+1 0 0 1 66 640 Tm
+(        "source": "official Dyson listing") Tj
+/F1 10 Tf
+1 0 0 1 66 626 Tm
+(      },) Tj
+/F1 10 Tf
+1 0 0 1 66 612 Tm
+(      "representative_prices": [) Tj
+/F1 10 Tf
+1 0 0 1 66 598 Tm
+(        {) Tj
+/F1 10 Tf
+1 0 0 1 66 584 Tm
+(          "seller": "Dyson",) Tj
+/F1 10 Tf
+1 0 0 1 66 570 Tm
+(          "price": 699.99,) Tj
+/F1 10 Tf
+1 0 0 1 66 556 Tm
+(          "availability": "in stock") Tj
+/F1 10 Tf
+1 0 0 1 66 542 Tm
+(        },) Tj
+/F1 10 Tf
+1 0 0 1 66 528 Tm
+(        {) Tj
+/F1 10 Tf
+1 0 0 1 66 514 Tm
+(          "seller": "Best Buy",) Tj
+/F1 10 Tf
+1 0 0 1 66 500 Tm
+(          "price": 679.99,) Tj
+/F1 10 Tf
+1 0 0 1 66 486 Tm
+(          "availability": "in stock") Tj
+/F1 10 Tf
+1 0 0 1 66 472 Tm
+(        }) Tj
+/F1 10 Tf
+1 0 0 1 66 458 Tm
+(      ],) Tj
+/F1 10 Tf
+1 0 0 1 66 444 Tm
+(      "pricing_summary": "Observed offers cluster below MSRP across major retailers.",) Tj
+/F1 10 Tf
+1 0 0 1 66 430 Tm
+(      "source_notes": [) Tj
+/F1 10 Tf
+1 0 0 1 66 416 Tm
+(        "Official brand listing used to anchor MSRP.",) Tj
+/F1 10 Tf
+1 0 0 1 66 402 Tm
+(        "Retailer listings used for current sale pricing.") Tj
+/F1 10 Tf
+1 0 0 1 66 388 Tm
+(      ],) Tj
+/F1 10 Tf
+1 0 0 1 66 374 Tm
+(      "freshness_note": "Signals were gathered from live web research during the run.") Tj
+/F1 10 Tf
+1 0 0 1 66 360 Tm
+(    }) Tj
+/F1 10 Tf
+1 0 0 1 66 346 Tm
+(  ]) Tj
+/F1 10 Tf
+1 0 0 1 66 332 Tm
+(}) Tj
+/F1 10 Tf
+1 0 0 1 54 318 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 304 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 290 Tm
+(Schéma d'architecture) Tj
+/F1 10 Tf
+1 0 0 1 54 270 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 256 Tm
+([mermaid]) Tj
+/F1 10 Tf
+1 0 0 1 66 242 Tm
+(flowchart TD) Tj
+/F1 10 Tf
+1 0 0 1 66 228 Tm
+(    A["User<br/>Analyze Dyson V15"] --> B["API Layer<br/>ADK API Server or ADK Web"]) Tj
+/F1 10 Tf
+1 0 0 1 66 214 Tm
+(    B --> C["MarketAnalysisOrchestrator<br/>Custom ADK BaseAgent"]) Tj
+/F1 10 Tf
+1 0 0 1 66 200 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 186 Tm
+(    C --> D["ResearchScopeAgent<br/>Resolve product, category, and market<br/>Use search) Tj
+/F1 10 Tf
+1 0 0 1 66 172 Tm
+( when helpful"]) Tj
+/F1 10 Tf
+1 0 0 1 66 158 Tm
+(    D --> E{"Clarification needed?"}) Tj
+/F1 10 Tf
+1 0 0 1 66 144 Tm
+(    E -- Yes --> F["ClarificationAgent<br/>Ask one short follow-up question"]) Tj
+/F1 10 Tf
+1 0 0 1 66 130 Tm
+(    E -- No --> G["CompetitorDiscoveryAgent<br/>Search competitors and build competitor ) Tj
+/F1 10 Tf
+1 0 0 1 66 116 Tm
+(set"]) Tj
+/F1 10 Tf
+1 0 0 1 66 102 Tm
+(    G --> P["ParallelMarketResearchAgent<br/>Run pricing, review, sentiment,<br/>and ) Tj
+/F1 10 Tf
+1 0 0 1 66 88 Tm
+(trend research in parallel"]) Tj
+/F1 10 Tf
+1 0 0 1 66 74 Tm
+(    P --> I["PricingIntelligenceAgent"]) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Length 2946 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 66 738 Tm
+(    P --> J["ReviewCorpusAgent"]) Tj
+/F1 10 Tf
+1 0 0 1 66 724 Tm
+(    P --> K["ReviewSentimentAgent"]) Tj
+/F1 10 Tf
+1 0 0 1 66 710 Tm
+(    P --> L["TrendSignalsAgent"]) Tj
+/F1 10 Tf
+1 0 0 1 66 696 Tm
+(    D --> M["Shared ADK Session State"]) Tj
+/F1 10 Tf
+1 0 0 1 66 682 Tm
+(    G --> M) Tj
+/F1 10 Tf
+1 0 0 1 66 668 Tm
+(    I --> M) Tj
+/F1 10 Tf
+1 0 0 1 66 654 Tm
+(    J --> M) Tj
+/F1 10 Tf
+1 0 0 1 66 640 Tm
+(    K --> M) Tj
+/F1 10 Tf
+1 0 0 1 66 626 Tm
+(    L --> M) Tj
+/F1 10 Tf
+1 0 0 1 66 612 Tm
+(    M --> H["MarketAnalysisAgent<br/>Synthesize grounded report"]) Tj
+/F1 10 Tf
+1 0 0 1 66 598 Tm
+(    H --> N["Final Output<br/>Business-ready market analysis"]) Tj
+/F1 10 Tf
+1 0 0 1 54 584 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 570 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 556 Tm
+(Modèle d'orchestration) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+([mermaid]) Tj
+/F1 10 Tf
+1 0 0 1 66 508 Tm
+(sequenceDiagram) Tj
+/F1 10 Tf
+1 0 0 1 66 494 Tm
+(    participant U as User) Tj
+/F1 10 Tf
+1 0 0 1 66 480 Tm
+(    participant API as ADK Runtime) Tj
+/F1 10 Tf
+1 0 0 1 66 466 Tm
+(    participant ORCH as MarketAnalysisOrchestrator) Tj
+/F1 10 Tf
+1 0 0 1 66 452 Tm
+(    participant RS as ResearchScopeAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 438 Tm
+(    participant CL as ClarificationAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 424 Tm
+(    participant CD as CompetitorDiscoveryAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 410 Tm
+(    participant PMR as ParallelMarketResearchAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 396 Tm
+(    participant MA as MarketAnalysisAgent) Tj
+/F1 10 Tf
+1 0 0 1 66 382 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 368 Tm
+(    U->>API: Analyze Dyson V15) Tj
+/F1 10 Tf
+1 0 0 1 66 354 Tm
+(    API->>ORCH: Start analysis) Tj
+/F1 10 Tf
+1 0 0 1 66 340 Tm
+(    ORCH->>RS: Resolve request into research_scope) Tj
+/F1 10 Tf
+1 0 0 1 66 326 Tm
+(    RS-->>ORCH: research_scope) Tj
+/F1 10 Tf
+1 0 0 1 66 312 Tm
+(    alt Clarification needed) Tj
+/F1 10 Tf
+1 0 0 1 66 298 Tm
+(        ORCH->>CL: Ask one follow-up question) Tj
+/F1 10 Tf
+1 0 0 1 66 284 Tm
+(        CL-->>API: clarification prompt) Tj
+/F1 10 Tf
+1 0 0 1 66 270 Tm
+(    else Product is clear) Tj
+/F1 10 Tf
+1 0 0 1 66 256 Tm
+(        ORCH->>CD: Discover competitors automatically) Tj
+/F1 10 Tf
+1 0 0 1 66 242 Tm
+(        CD-->>ORCH: competitor_set) Tj
+/F1 10 Tf
+1 0 0 1 66 228 Tm
+(        ORCH->>PMR: Run parallel live market research) Tj
+/F1 10 Tf
+1 0 0 1 66 214 Tm
+(        PMR-->>ORCH: pricing_intelligence, review_corpus, review_sentiment, ) Tj
+/F1 10 Tf
+1 0 0 1 66 200 Tm
+(trend_signals) Tj
+/F1 10 Tf
+1 0 0 1 66 186 Tm
+(        ORCH->>MA: Synthesize grounded report) Tj
+/F1 10 Tf
+1 0 0 1 66 172 Tm
+(        MA-->>API: market_analysis_report) Tj
+/F1 10 Tf
+1 0 0 1 66 158 Tm
+(    end) Tj
+/F1 10 Tf
+1 0 0 1 66 144 Tm
+(    API-->>U: Final response) Tj
+/F1 10 Tf
+1 0 0 1 54 130 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 116 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 102 Tm
+(Comportement des agents) Tj
+/F1 10 Tf
+1 0 0 1 54 82 Tm
+() Tj
+ET
+endstream
+endobj
+12 0 obj
+<< /Length 2871 >>
+stream
+BT
+/F2 13 Tf
+1 0 0 1 54 738 Tm
+(1. ResearchScopeAgent) Tj
+/F1 10 Tf
+1 0 0 1 54 720 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 706 Tm
+(**Rôle**) Tj
+/F1 10 Tf
+1 0 0 1 54 692 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 678 Tm
+(Transforme une demande utilisateur simple en un périmètre de recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 664 Tm
+(structuré.) Tj
+/F1 10 Tf
+1 0 0 1 54 650 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 636 Tm
+(**Ce qu'il fait**) Tj
+/F1 10 Tf
+1 0 0 1 54 622 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 608 Tm
+(• résout le nom canonique du produit) Tj
+/F1 10 Tf
+1 0 0 1 54 594 Tm
+(• déduit la marque, la catégorie et le marché) Tj
+/F1 10 Tf
+1 0 0 1 54 580 Tm
+(• utilise `google_search` lorsque cela aide à confirmer le produit ou à) Tj
+/F1 10 Tf
+1 0 0 1 54 566 Tm
+(  détecter une ambiguïté) Tj
+/F1 10 Tf
+1 0 0 1 54 552 Tm
+(• renseigne `requires_clarification` et `resolution_confidence`) Tj
+/F1 10 Tf
+1 0 0 1 54 538 Tm
+(• n'identifie pas les concurrents) Tj
+/F1 10 Tf
+1 0 0 1 54 524 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 510 Tm
+(2. ClarificationAgent) Tj
+/F1 10 Tf
+1 0 0 1 54 492 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 478 Tm
+(**Rôle**) Tj
+/F1 10 Tf
+1 0 0 1 54 464 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 450 Tm
+(Pose une question de suivi courte et concrète lorsque la demande est ambiguë.) Tj
+/F1 10 Tf
+1 0 0 1 54 436 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 422 Tm
+(**Ce qu'il fait**) Tj
+/F1 10 Tf
+1 0 0 1 54 408 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 394 Tm
+(• lit `research_scope` depuis l'état de session) Tj
+/F1 10 Tf
+1 0 0 1 54 380 Tm
+(• demande l'information manquante nécessaire pour continuer) Tj
+/F1 10 Tf
+1 0 0 1 54 366 Tm
+(• n'exécute pas de recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 352 Tm
+(• ne génère pas de rapport de marché) Tj
+/F1 10 Tf
+1 0 0 1 54 338 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 324 Tm
+(Cette séparation garde la clarification conversationnelle et prévisible au lieu) Tj
+/F1 10 Tf
+1 0 0 1 54 310 Tm
+(de la cacher derrière un outil.) Tj
+/F1 10 Tf
+1 0 0 1 54 296 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 282 Tm
+(3. CompetitorDiscoveryAgent) Tj
+/F1 10 Tf
+1 0 0 1 54 264 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 250 Tm
+(**Rôle**) Tj
+/F1 10 Tf
+1 0 0 1 54 236 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 222 Tm
+(Trouve les concurrents les plus pertinents pour le produit résolu.) Tj
+/F1 10 Tf
+1 0 0 1 54 208 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 194 Tm
+(**Comment il fonctionne**) Tj
+/F1 10 Tf
+1 0 0 1 54 180 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 166 Tm
+(Il dérive ses propres requêtes de recherche à partir de `research_scope`. Pour) Tj
+/F1 10 Tf
+1 0 0 1 54 152 Tm
+(`Dyson V15 Detect`, ces requêtes peuvent ressembler à :) Tj
+/F1 10 Tf
+1 0 0 1 54 138 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 124 Tm
+(• `Dyson V15 Detect competitors`) Tj
+/F1 10 Tf
+1 0 0 1 54 110 Tm
+(• `best premium cordless stick vacuums`) Tj
+/F1 10 Tf
+1 0 0 1 54 96 Tm
+(• `alternatives to Dyson V15 Detect`) Tj
+/F1 10 Tf
+1 0 0 1 54 82 Tm
+(• `Dyson V15 vs Shark Detect Pro`) Tj
+/F1 10 Tf
+1 0 0 1 54 68 Tm
+(• `Dyson V15 vs Tineco Pure One S15`) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Length 3020 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(Il classe ensuite les candidats à partir de :) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(• la similarité de catégorie) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(• la proximité de gamme de prix) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+(• la similarité d'usage) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+(• la répétition à travers les sources) Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 626 Tm
+(4. ParallelMarketResearchAgent) Tj
+/F1 10 Tf
+1 0 0 1 54 608 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 594 Tm
+(**Rôle**) Tj
+/F1 10 Tf
+1 0 0 1 54 580 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 566 Tm
+(Exécute en concurrence quatre branches de recherche en direct une fois que le) Tj
+/F1 10 Tf
+1 0 0 1 54 552 Tm
+(périmètre produit et l'ensemble des concurrents sont stabilisés.) Tj
+/F1 10 Tf
+1 0 0 1 54 538 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 524 Tm
+(**Pourquoi cette étape existe**) Tj
+/F1 10 Tf
+1 0 0 1 54 510 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 496 Tm
+(Selon le modèle ADK `ParallelAgent`, les branches parallèles sont les plus) Tj
+/F1 10 Tf
+1 0 0 1 54 482 Tm
+(utiles lorsque le travail est indépendant. C'est exactement le cas ici, car les) Tj
+/F1 10 Tf
+1 0 0 1 54 468 Tm
+(signaux de prix, les preuves issues des avis, les signaux de sentiment et les) Tj
+/F1 10 Tf
+1 0 0 1 54 454 Tm
+(signaux de tendance peuvent tous être collectés séparément après la découverte) Tj
+/F1 10 Tf
+1 0 0 1 54 440 Tm
+(des concurrents.) Tj
+/F1 10 Tf
+1 0 0 1 54 426 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 412 Tm
+(**Comportement ADK important**) Tj
+/F1 10 Tf
+1 0 0 1 54 398 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 384 Tm
+(Les sous-agents parallèles ne partagent pas automatiquement leur historique de) Tj
+/F1 10 Tf
+1 0 0 1 54 370 Tm
+(branche entre eux pendant l'exécution. Chaque branche écrit sa propre sortie) Tj
+/F1 10 Tf
+1 0 0 1 54 356 Tm
+(dans l'état de session, et l'agent final de synthèse réconcilie ensuite ces) Tj
+/F1 10 Tf
+1 0 0 1 54 342 Tm
+(résultats.) Tj
+/F1 10 Tf
+1 0 0 1 54 328 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 314 Tm
+(**Sorties écrites dans l'état**) Tj
+/F1 10 Tf
+1 0 0 1 54 300 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 286 Tm
+(• `pricing_intelligence`) Tj
+/F1 10 Tf
+1 0 0 1 54 272 Tm
+(• `review_corpus`) Tj
+/F1 10 Tf
+1 0 0 1 54 258 Tm
+(• `review_sentiment`) Tj
+/F1 10 Tf
+1 0 0 1 54 244 Tm
+(• `trend_signals`) Tj
+/F1 10 Tf
+1 0 0 1 54 230 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 216 Tm
+(5. MarketAnalysisAgent) Tj
+/F1 10 Tf
+1 0 0 1 54 198 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 184 Tm
+(**Rôle**) Tj
+/F1 10 Tf
+1 0 0 1 54 170 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 156 Tm
+(Synthétise `research_scope`, `competitor_set`, `pricing_intelligence`,) Tj
+/F1 10 Tf
+1 0 0 1 54 142 Tm
+(`review_corpus`, `review_sentiment` et `trend_signals` pour produire le rapport) Tj
+/F1 10 Tf
+1 0 0 1 54 128 Tm
+(final en Markdown.) Tj
+/F1 10 Tf
+1 0 0 1 54 114 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 100 Tm
+(**Pourquoi la synthèse reste séparée**) Tj
+/F1 10 Tf
+1 0 0 1 54 86 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 72 Tm
+(Cela permet de garder le rapport ancré sur des preuves déjà collectées et) Tj
+ET
+endstream
+endobj
+14 0 obj
+<< /Length 2959 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(d'éviter de mélanger le comportement de recherche en direct avec l'étape finale) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(de reporting.) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 696 Tm
+(Stratégie de recherche en direct) Tj
+/F1 10 Tf
+1 0 0 1 54 676 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 662 Tm
+(Le runtime actuel utilise quatre branches de recherche spécialisées après la) Tj
+/F1 10 Tf
+1 0 0 1 54 648 Tm
+(découverte des concurrents.) Tj
+/F1 10 Tf
+1 0 0 1 54 634 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 620 Tm
+(Branche prix) Tj
+/F1 10 Tf
+1 0 0 1 54 602 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 588 Tm
+(`PricingIntelligenceAgent` collecte des signaux de prix en direct pour le) Tj
+/F1 10 Tf
+1 0 0 1 54 574 Tm
+(produit principal et ses concurrents.) Tj
+/F1 10 Tf
+1 0 0 1 54 560 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 546 Tm
+(Priorités :) Tj
+/F1 10 Tf
+1 0 0 1 54 532 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 518 Tm
+(• les pages officielles des marques pour les signaux de MSRP ou de prix public) Tj
+/F1 10 Tf
+1 0 0 1 54 504 Tm
+(• les grands retailers pour les prix observés à l'instant) Tj
+/F1 10 Tf
+1 0 0 1 54 490 Tm
+(• les notes de fraîcheur et le contexte source pour la synthèse aval) Tj
+/F1 10 Tf
+1 0 0 1 54 476 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 462 Tm
+(Branche preuves issues des avis) Tj
+/F1 10 Tf
+1 0 0 1 54 444 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 430 Tm
+(`ReviewCorpusAgent` collecte des preuves issues des sources d'avis pour le) Tj
+/F1 10 Tf
+1 0 0 1 54 416 Tm
+(produit principal et ses concurrents.) Tj
+/F1 10 Tf
+1 0 0 1 54 402 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 388 Tm
+(Elle se concentre sur :) Tj
+/F1 10 Tf
+1 0 0 1 54 374 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 360 Tm
+(• les sources d'avis jugées fiables) Tj
+/F1 10 Tf
+1 0 0 1 54 346 Tm
+(• les signaux de note et de volume d'avis) Tj
+/F1 10 Tf
+1 0 0 1 54 332 Tm
+(• des extraits synthétiques plutôt que de longs passages cités) Tj
+/F1 10 Tf
+1 0 0 1 54 318 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 304 Tm
+(Branche sentiment) Tj
+/F1 10 Tf
+1 0 0 1 54 286 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 272 Tm
+(`ReviewSentimentAgent` collecte les thèmes positifs, les irritants clients et) Tj
+/F1 10 Tf
+1 0 0 1 54 258 Tm
+(les signaux globaux de sentiment.) Tj
+/F1 10 Tf
+1 0 0 1 54 244 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 230 Tm
+(Cette branche est volontairement séparée de `ReviewCorpusAgent`. Dans le runtime) Tj
+/F1 10 Tf
+1 0 0 1 54 216 Tm
+(actuel, le sentiment est collecté comme un flux de preuves de recherche en) Tj
+/F1 10 Tf
+1 0 0 1 54 202 Tm
+(direct distinct plutôt que calculé à partir d'un corpus d'avis unique et) Tj
+/F1 10 Tf
+1 0 0 1 54 188 Tm
+(normalisé.) Tj
+/F1 10 Tf
+1 0 0 1 54 174 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 160 Tm
+(Branche tendance) Tj
+/F1 10 Tf
+1 0 0 1 54 142 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 128 Tm
+(`TrendSignalsAgent` collecte des signaux de demande de catégorie et de tendance) Tj
+/F1 10 Tf
+1 0 0 1 54 114 Tm
+(de marché.) Tj
+/F1 10 Tf
+1 0 0 1 54 100 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 86 Tm
+(Elle se concentre sur :) Tj
+/F1 10 Tf
+1 0 0 1 54 72 Tm
+() Tj
+ET
+endstream
+endobj
+15 0 obj
+<< /Length 3454 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(• le sens de la demande) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(• la pression sur les prix) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(• la dynamique de catégorie) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(• les signaux de support qui aident le rapport final à expliquer le contexte de) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(  marché) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 654 Tm
+(Outils spécialisés implémentés) Tj
+/F1 10 Tf
+1 0 0 1 54 634 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 620 Tm
+(Le dépôt implémente les outils Python spécialisés suivants :) Tj
+/F1 10 Tf
+1 0 0 1 54 606 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 592 Tm
+(• `pricing_intelligence`) Tj
+/F1 10 Tf
+1 0 0 1 54 578 Tm
+(• `review_corpus`) Tj
+/F1 10 Tf
+1 0 0 1 54 564 Tm
+(• `review_sentiment`) Tj
+/F1 10 Tf
+1 0 0 1 54 550 Tm
+(• `trend_signals`) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+(dans `agents/ecommerce_agents/tools.py`, ainsi que des providers alimentés par) Tj
+/F1 10 Tf
+1 0 0 1 54 508 Tm
+(des fixtures dans `agents/ecommerce_agents/providers/mock.py`.) Tj
+/F1 10 Tf
+1 0 0 1 54 494 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 480 Tm
+(Ces outils répondent directement à l'exigence du test demandant au minimum) Tj
+/F1 10 Tf
+1 0 0 1 54 466 Tm
+(trois outils spécialisés :) Tj
+/F1 10 Tf
+1 0 0 1 54 452 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 438 Tm
+(Outil | Rôle | Usage actuel) Tj
+/F1 10 Tf
+1 0 0 1 54 424 Tm
+(--- | --- | ---) Tj
+/F1 10 Tf
+1 0 0 1 54 410 Tm
+(`pricing_intelligence` | Normalise les données de prix et d'offres par produit |) Tj
+/F1 10 Tf
+1 0 0 1 54 396 Tm
+(Validation déterministe et futur runtime hybride) Tj
+/F1 10 Tf
+1 0 0 1 54 382 Tm
+(`review_corpus` | Collecte les preuves issues des sources d'avis | Validation) Tj
+/F1 10 Tf
+1 0 0 1 54 368 Tm
+(déterministe et futur runtime hybride) Tj
+/F1 10 Tf
+1 0 0 1 54 354 Tm
+(`review_sentiment` | Extrait les thèmes positifs, points de douleur et polarité |) Tj
+/F1 10 Tf
+1 0 0 1 54 340 Tm
+(Validation déterministe et futur runtime hybride) Tj
+/F1 10 Tf
+1 0 0 1 54 326 Tm
+(`trend_signals` | Résume la demande de catégorie et la pression sur les prix |) Tj
+/F1 10 Tf
+1 0 0 1 54 312 Tm
+(Validation déterministe et futur runtime hybride) Tj
+/F1 10 Tf
+1 0 0 1 54 298 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 284 Tm
+(Ces modules sont réels, testés et conçus dans un esprit production.) Tj
+/F1 10 Tf
+1 0 0 1 54 270 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 256 Tm
+(Les outils locaux ne constituent pas aujourd'hui le chemin principal) Tj
+/F1 10 Tf
+1 0 0 1 54 242 Tm
+(d'exécution ADK, car le runtime actuel privilégie une orchestration) Tj
+/F1 10 Tf
+1 0 0 1 54 228 Tm
+(multi-agents ancrée sur la recherche web afin de démontrer un comportement de) Tj
+/F1 10 Tf
+1 0 0 1 54 214 Tm
+(recherche de marché de bout en bout dans Google ADK. La couche d'outils reste) Tj
+/F1 10 Tf
+1 0 0 1 54 200 Tm
+(néanmoins implémentée et testée comme couche modulaire de capacités pour la) Tj
+/F1 10 Tf
+1 0 0 1 54 186 Tm
+(validation déterministe et pour de futures intégrations avec des fournisseurs) Tj
+/F1 10 Tf
+1 0 0 1 54 172 Tm
+(de données plus structurés.) Tj
+/F1 10 Tf
+1 0 0 1 54 158 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 144 Tm
+(Leur rôle actuel est :) Tj
+/F1 10 Tf
+1 0 0 1 54 130 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 116 Tm
+(• les tests unitaires déterministes) Tj
+/F1 10 Tf
+1 0 0 1 54 102 Tm
+(• une validation locale stable des formes de données) Tj
+/F1 10 Tf
+1 0 0 1 54 88 Tm
+(• un socle pour une future couche hybride ou connectée à des API) Tj
+/F1 10 Tf
+1 0 0 1 54 74 Tm
+() Tj
+ET
+endstream
+endobj
+16 0 obj
+<< /Length 3439 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(Une bonne direction future serait de laisser les branches de recherche en) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(direct découvrir les preuves, puis de remplacer progressivement les branches) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(les plus utiles par des providers basés sur des API, là où la fraîcheur et le) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(contrôle des sources sont plus forts.) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 668 Tm
+(Exemple de comportement de bout en bout) Tj
+/F1 10 Tf
+1 0 0 1 54 648 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 634 Tm
+(Entrée utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 616 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 602 Tm
+([text]) Tj
+/F1 10 Tf
+1 0 0 1 66 588 Tm
+(Analyze Dyson V15) Tj
+/F1 10 Tf
+1 0 0 1 54 574 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 560 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 546 Tm
+(Comportement interne du système) Tj
+/F1 10 Tf
+1 0 0 1 54 528 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 514 Tm
+(1. Le système résout `Dyson V15` en `Dyson V15 Detect`.) Tj
+/F1 10 Tf
+1 0 0 1 54 500 Tm
+(2. Le système identifie la catégorie comme `cordless stick vacuum`.) Tj
+/F1 10 Tf
+1 0 0 1 54 486 Tm
+(3. Le système découvre automatiquement des concurrents probables.) Tj
+/F1 10 Tf
+1 0 0 1 54 472 Tm
+(4. L'étape de recherche parallèle collecte des signaux de prix, d'avis, de) Tj
+/F1 10 Tf
+1 0 0 1 54 458 Tm
+(   sentiment et de tendance.) Tj
+/F1 10 Tf
+1 0 0 1 54 444 Tm
+(5. L'agent final d'analyse synthétise ces éléments ancrés dans un seul rapport.) Tj
+/F1 10 Tf
+1 0 0 1 54 430 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 416 Tm
+(Exemple représentatif de rapport généré) Tj
+/F1 10 Tf
+1 0 0 1 54 398 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 384 Tm
+(Le bloc Markdown ci-dessous est un exemple réel capturé à partir d'une) Tj
+/F1 10 Tf
+1 0 0 1 54 370 Tm
+(exécution locale réussie pour la demande `iMac`. Je conserve plus haut) Tj
+/F1 10 Tf
+1 0 0 1 54 356 Tm
+(l'exemple `Dyson` comme illustration simple du flux d'architecture, mais ce) Tj
+/F1 10 Tf
+1 0 0 1 54 342 Tm
+(rapport est plus fort pour un reviewer car il montre la qualité réelle de) Tj
+/F1 10 Tf
+1 0 0 1 54 328 Tm
+(synthèse du runtime actuel.) Tj
+/F1 10 Tf
+1 0 0 1 54 314 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 300 Tm
+(Cet exemple est inclus directement dans le README afin de satisfaire le) Tj
+/F1 10 Tf
+1 0 0 1 54 286 Tm
+(livrable demandant un exemple de rapport généré sans obliger le reviewer à) Tj
+/F1 10 Tf
+1 0 0 1 54 272 Tm
+(ouvrir un autre fichier.) Tj
+/F1 10 Tf
+1 0 0 1 54 258 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 244 Tm
+(Pour les reviewers qui souhaitent inspecter l'artefact brut capturé à) Tj
+/F1 10 Tf
+1 0 0 1 54 230 Tm
+(l'exécution, la session ADK exportée complète correspondant à cet exemple est) Tj
+/F1 10 Tf
+1 0 0 1 54 216 Tm
+(aussi disponible dans) Tj
+/F1 10 Tf
+1 0 0 1 54 202 Tm
+(`session-dea91c0c-fd25-4396-9bbb-cb572080cd8e.json`. Ce JSON contient l'état) Tj
+/F1 10 Tf
+1 0 0 1 54 188 Tm
+(résolu, les sorties intermédiaires de recherche, le rapport final et les) Tj
+/F1 10 Tf
+1 0 0 1 54 174 Tm
+(événements enregistrés durant l'exécution.) Tj
+/F1 10 Tf
+1 0 0 1 54 160 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 146 Tm
+([md]) Tj
+/F1 10 Tf
+1 0 0 1 66 132 Tm
+(# iMac Market Analysis Report) Tj
+/F1 10 Tf
+1 0 0 1 66 118 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 104 Tm
+(## executive_summary) Tj
+/F1 10 Tf
+1 0 0 1 66 90 Tm
+(The Apple iMac continues to occupy a dominant position in the premium All-in-One) Tj
+/F1 10 Tf
+1 0 0 1 66 76 Tm
+(\(AIO\) desktop market, largely propelled by its distinct minimalist design, 4.5K) Tj
+ET
+endstream
+endobj
+17 0 obj
+<< /Length 4475 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 66 738 Tm
+(Retina display, and the highly efficient Apple Silicon \(M-series\)) Tj
+/F1 10 Tf
+1 0 0 1 66 724 Tm
+(architecture. Synthesis of recent market data indicates that while the iMac) Tj
+/F1 10 Tf
+1 0 0 1 66 710 Tm
+(holds strong brand loyalty and high overall customer satisfaction, it faces) Tj
+/F1 10 Tf
+1 0 0 1 66 696 Tm
+(emerging pressure from premium Windows AIOs focusing on touchscreen) Tj
+/F1 10 Tf
+1 0 0 1 66 682 Tm
+(capabilities and ergonomic flexibility. Furthermore, shifting consumer) Tj
+/F1 10 Tf
+1 0 0 1 66 668 Tm
+(expectations regarding base memory \(RAM\) and the desire for larger screen form) Tj
+/F1 10 Tf
+1 0 0 1 66 654 Tm
+(factors present distinct vulnerabilities in the current 24-inch lineup.) Tj
+/F1 10 Tf
+1 0 0 1 66 640 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 626 Tm
+(## competitor_landscape) Tj
+/F1 10 Tf
+1 0 0 1 66 612 Tm
+(The competitive set for the iMac consists of both volume-driven consumer AIOs) Tj
+/F1 10 Tf
+1 0 0 1 66 598 Tm
+(and specialized premium creative workstations. Key rivals include:) Tj
+/F1 10 Tf
+1 0 0 1 66 584 Tm
+(* **HP Envy AIO & Dell Inspiron 24/27 AIO:** These represent the primary volume) Tj
+/F1 10 Tf
+1 0 0 1 66 570 Tm
+(  competitors. They offer larger screen options and competitive processing) Tj
+/F1 10 Tf
+1 0 0 1 66 556 Tm
+(  power at a lower entry price, appealing to budget-conscious home office) Tj
+/F1 10 Tf
+1 0 0 1 66 542 Tm
+(  users.) Tj
+/F1 10 Tf
+1 0 0 1 66 528 Tm
+(* **Lenovo Yoga AIO 9i:** A direct competitor in the premium design space. It) Tj
+/F1 10 Tf
+1 0 0 1 66 514 Tm
+(  challenges the iMac's aesthetic dominance with a sleek, architectural build) Tj
+/F1 10 Tf
+1 0 0 1 66 500 Tm
+(  and offers 4K displays with robust internal specifications.) Tj
+/F1 10 Tf
+1 0 0 1 66 486 Tm
+(* **Microsoft Surface Studio 2+:** Targeted at creative professionals, this) Tj
+/F1 10 Tf
+1 0 0 1 66 472 Tm
+(  device competes with the iMac on premium build quality and display) Tj
+/F1 10 Tf
+1 0 0 1 66 458 Tm
+(  excellence. Note on uncertainty: Evidence is mixed on whether consumers) Tj
+/F1 10 Tf
+1 0 0 1 66 444 Tm
+(  directly cross-shop the Surface Studio 2+ with the standard iMac, given the) Tj
+/F1 10 Tf
+1 0 0 1 66 430 Tm
+(  Surface's significantly higher price point and specialized touchscreen/hinge) Tj
+/F1 10 Tf
+1 0 0 1 66 416 Tm
+(  mechanics.) Tj
+/F1 10 Tf
+1 0 0 1 66 402 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 388 Tm
+(## pricing_summary) Tj
+/F1 10 Tf
+1 0 0 1 66 374 Tm
+(Pricing intelligence reveals that the iMac sits firmly in the premium tier of) Tj
+/F1 10 Tf
+1 0 0 1 66 360 Tm
+(the consumer AIO market.) Tj
+/F1 10 Tf
+1 0 0 1 66 346 Tm
+(* **iMac Pricing:** The base model currently starts at $1,299. However, Apple's) Tj
+/F1 10 Tf
+1 0 0 1 66 332 Tm
+(  upgrade pricing structure is steep, with memory and storage upgrades quickly) Tj
+/F1 10 Tf
+1 0 0 1 66 318 Tm
+(  pushing the system into the $1,699 to $1,899 range.) Tj
+/F1 10 Tf
+1 0 0 1 66 304 Tm
+(* **Competitor Pricing:** The broader PC AIO market averages between $800 and) Tj
+/F1 10 Tf
+1 0 0 1 66 290 Tm
+(  $1,100. Competitors like Dell and HP offer 16GB of RAM and 1TB of storage at) Tj
+/F1 10 Tf
+1 0 0 1 66 276 Tm
+(  price points where the iMac still provides 8GB of RAM and 256GB of storage.) Tj
+/F1 10 Tf
+1 0 0 1 66 262 Tm
+(* **Value Perception:** Despite the premium, the iMac's total cost of ownership) Tj
+/F1 10 Tf
+1 0 0 1 66 248 Tm
+(  is often perceived favorably due to high resale value and bundled) Tj
+/F1 10 Tf
+1 0 0 1 66 234 Tm
+(  peripherals, though the base model's specification limits its perceived value) Tj
+/F1 10 Tf
+1 0 0 1 66 220 Tm
+(  among power users.) Tj
+/F1 10 Tf
+1 0 0 1 66 206 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 192 Tm
+(## customer_sentiment) Tj
+/F1 10 Tf
+1 0 0 1 66 178 Tm
+(Analysis of the review corpus highlights a polarized but generally positive) Tj
+/F1 10 Tf
+1 0 0 1 66 164 Tm
+(customer sentiment.) Tj
+/F1 10 Tf
+1 0 0 1 66 150 Tm
+(* **Positive Drivers:** The 4.5K Retina display is universally praised for its) Tj
+/F1 10 Tf
+1 0 0 1 66 136 Tm
+(  color accuracy and brightness. Users are highly satisfied with the M-series) Tj
+/F1 10 Tf
+1 0 0 1 66 122 Tm
+(  chip performance, noting the system's speed, efficiency, and virtually silent) Tj
+/F1 10 Tf
+1 0 0 1 66 108 Tm
+(  operation. The slim profile and vibrant color options remain a major) Tj
+/F1 10 Tf
+1 0 0 1 66 94 Tm
+(  purchasing driver for home users.) Tj
+/F1 10 Tf
+1 0 0 1 66 80 Tm
+(* **Negative Drivers:** The most significant source of negative sentiment) Tj
+ET
+endstream
+endobj
+18 0 obj
+<< /Length 3847 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 66 738 Tm
+(  surrounds the base model's 8GB of unified memory, which many reviewers and) Tj
+/F1 10 Tf
+1 0 0 1 66 724 Tm
+(  users feel is inadequate for a machine in this price bracket. Additionally,) Tj
+/F1 10 Tf
+1 0 0 1 66 710 Tm
+(  ergonomic limitations and the persistent frustration over the Magic Mouse's) Tj
+/F1 10 Tf
+1 0 0 1 66 696 Tm
+(  bottom-facing charging port are frequently cited pain points.) Tj
+/F1 10 Tf
+1 0 0 1 66 682 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 668 Tm
+(## market_trends) Tj
+/F1 10 Tf
+1 0 0 1 66 654 Tm
+(Several overarching trend signals are actively shaping the AIO desktop market:) Tj
+/F1 10 Tf
+1 0 0 1 66 640 Tm
+(* **The AI PC Era:** There is a heavy industry-wide shift toward marketing AI) Tj
+/F1 10 Tf
+1 0 0 1 66 626 Tm
+(  capabilities. With the rollout of Apple Intelligence on macOS, consumers are) Tj
+/F1 10 Tf
+1 0 0 1 66 612 Tm
+(  increasingly evaluating desktop purchases based on on-device machine learning) Tj
+/F1 10 Tf
+1 0 0 1 66 598 Tm
+(  performance.) Tj
+/F1 10 Tf
+1 0 0 1 66 584 Tm
+(* **Desire for Larger Displays:** Trend signals indicate strong consumer demand) Tj
+/F1 10 Tf
+1 0 0 1 66 570 Tm
+(  for 27-inch and 32-inch form factors. The current limitation of the iMac to a) Tj
+/F1 10 Tf
+1 0 0 1 66 556 Tm
+(  24-inch model is driving some prosumer demographics toward Mac Mini setups) Tj
+/F1 10 Tf
+1 0 0 1 66 542 Tm
+(  paired with external monitors.) Tj
+/F1 10 Tf
+1 0 0 1 66 528 Tm
+(* **Market Growth Constraints:** Note on uncertainty: Market signals are mixed) Tj
+/F1 10 Tf
+1 0 0 1 66 514 Tm
+(  regarding the long-term growth of the AIO category. While remote work) Tj
+/F1 10 Tf
+1 0 0 1 66 500 Tm
+(  initially boosted AIO sales, the increasing power of laptops coupled with) Tj
+/F1 10 Tf
+1 0 0 1 66 486 Tm
+(  single-cable docking solutions is actively cannibalizing traditional desktop) Tj
+/F1 10 Tf
+1 0 0 1 66 472 Tm
+(  market share.) Tj
+/F1 10 Tf
+1 0 0 1 66 458 Tm
+( ) Tj
+/F1 10 Tf
+1 0 0 1 66 444 Tm
+(## recommendations) Tj
+/F1 10 Tf
+1 0 0 1 66 430 Tm
+(1. **Revise Base Specifications:** Raise the baseline memory for the entry-level) Tj
+/F1 10 Tf
+1 0 0 1 66 416 Tm
+(   iMac from 8GB to 16GB.) Tj
+/F1 10 Tf
+1 0 0 1 66 402 Tm
+(2. **Expand Form Factor Options:** Reintroduce a larger 27-inch or 32-inch) Tj
+/F1 10 Tf
+1 0 0 1 66 388 Tm
+(   variant to recapture the prosumer market.) Tj
+/F1 10 Tf
+1 0 0 1 66 374 Tm
+(3. **Peripheral Redesign:** Redesign the Magic Mouse to allow simultaneous use) Tj
+/F1 10 Tf
+1 0 0 1 66 360 Tm
+(   and charging, and offer a height-adjustable stand option.) Tj
+/F1 10 Tf
+1 0 0 1 66 346 Tm
+(4. **Lean into Apple Intelligence Marketing:** Emphasize the localized privacy) Tj
+/F1 10 Tf
+1 0 0 1 66 332 Tm
+(   and speed of the M-series Neural Engine against competitor AI PCs.) Tj
+/F1 10 Tf
+1 0 0 1 54 318 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 304 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 290 Tm
+(Orientation technique) Tj
+/F1 10 Tf
+1 0 0 1 54 270 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 256 Tm
+(Cible d'exécution) Tj
+/F1 10 Tf
+1 0 0 1 54 238 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 224 Tm
+(• **Langage** : Python 3.12) Tj
+/F1 10 Tf
+1 0 0 1 54 210 Tm
+(• **Framework** : Google ADK) Tj
+/F1 10 Tf
+1 0 0 1 54 196 Tm
+(• **Nom de l'application** : `ecommerce_agents`) Tj
+/F1 10 Tf
+1 0 0 1 54 182 Tm
+(• **Modèle par défaut** : `gemini-3.1-pro-preview`) Tj
+/F1 10 Tf
+1 0 0 1 54 168 Tm
+(• **Surfaces d'exécution** : ADK API Server et ADK Web UI) Tj
+/F1 10 Tf
+1 0 0 1 54 154 Tm
+(• **Cible de démarrage local** : Docker Compose sur macOS et Windows) Tj
+/F1 10 Tf
+1 0 0 1 54 140 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 126 Tm
+(Démarrage local containerisé) Tj
+/F1 10 Tf
+1 0 0 1 54 106 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 92 Tm
+(Le scaffold s'exécute via Docker Compose afin que le même workflow fonctionne) Tj
+/F1 10 Tf
+1 0 0 1 54 78 Tm
+(sur macOS et Windows. Le service API, l'interface web ADK et le runner de tests) Tj
+ET
+endstream
+endobj
+19 0 obj
+<< /Length 2802 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(réutilisent la même image.) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 710 Tm
+(1. Environnement d'exécution) Tj
+/F1 10 Tf
+1 0 0 1 54 692 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 678 Tm
+(Pour le démarrage local le plus rapide, modifiez `docker-compose.yml` et) Tj
+/F1 10 Tf
+1 0 0 1 54 664 Tm
+(remplacez :) Tj
+/F1 10 Tf
+1 0 0 1 54 650 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 636 Tm
+([text]) Tj
+/F1 10 Tf
+1 0 0 1 66 622 Tm
+(GOOGLE_API_KEY: GEMINI_API_KEY_HERE) Tj
+/F1 10 Tf
+1 0 0 1 54 608 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 594 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 580 Tm
+(par une clé Gemini valide, puis reconstruisez le conteneur.) Tj
+/F1 10 Tf
+1 0 0 1 54 566 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 552 Tm
+(Dans le fichier Compose, le runtime supporte aussi les valeurs optionnelles) Tj
+/F1 10 Tf
+1 0 0 1 54 538 Tm
+(suivantes :) Tj
+/F1 10 Tf
+1 0 0 1 54 524 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 510 Tm
+(• `ADK_MODEL`) Tj
+/F1 10 Tf
+1 0 0 1 54 496 Tm
+(• `DEFAULT_MARKET`) Tj
+/F1 10 Tf
+1 0 0 1 54 482 Tm
+(• `ANALYSIS_DB_PATH`) Tj
+/F1 10 Tf
+1 0 0 1 54 468 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 454 Tm
+(Si `ANALYSIS_DB_PATH` n'est pas défini, l'application utilise par défaut un) Tj
+/F1 10 Tf
+1 0 0 1 54 440 Tm
+(fichier SQLite local au dépôt à l'emplacement `.adk/analysis_history.db`.) Tj
+/F1 10 Tf
+1 0 0 1 54 426 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 412 Tm
+(2. Sélection du modèle) Tj
+/F1 10 Tf
+1 0 0 1 54 394 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 380 Tm
+(Le projet utilise par défaut `gemini-3.1-pro-preview`. À la date du) Tj
+/F1 10 Tf
+1 0 0 1 54 366 Tm
+(10 mars 2026, la page des modèles Gemini API déprécie Gemini 3 Pro Preview et) Tj
+/F1 10 Tf
+1 0 0 1 54 352 Tm
+(oriente les développeurs vers Gemini 3.1 Pro Preview. La page dédiée à Gemini) Tj
+/F1 10 Tf
+1 0 0 1 54 338 Tm
+(3.1 Pro Preview, mise à jour le 18 mars 2026, indique que Search grounding est) Tj
+/F1 10 Tf
+1 0 0 1 54 324 Tm
+(supporté, ce qui justifie ce choix de modèle pour la recherche en direct) Tj
+/F1 10 Tf
+1 0 0 1 54 310 Tm
+(ancrée sur le web.) Tj
+/F1 10 Tf
+1 0 0 1 54 296 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 282 Tm
+(3. Vérification préliminaire facultative) Tj
+/F1 10 Tf
+1 0 0 1 54 264 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 250 Tm
+(Avant le premier démarrage, vous pouvez valider le fichier Compose sans lancer) Tj
+/F1 10 Tf
+1 0 0 1 54 236 Tm
+(de conteneurs :) Tj
+/F1 10 Tf
+1 0 0 1 54 222 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 208 Tm
+([bash]) Tj
+/F1 10 Tf
+1 0 0 1 66 194 Tm
+(docker compose config) Tj
+/F1 10 Tf
+1 0 0 1 54 180 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 166 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 152 Tm
+(4. Scripts utilitaires) Tj
+/F1 10 Tf
+1 0 0 1 54 134 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 120 Tm
+(Si vous voulez des commandes plus courtes, utilisez les scripts utilitaires.) Tj
+/F1 10 Tf
+1 0 0 1 54 106 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 92 Tm
+(Windows :) Tj
+/F1 10 Tf
+1 0 0 1 54 78 Tm
+() Tj
+ET
+endstream
+endobj
+20 0 obj
+<< /Length 2458 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+([cmd]) Tj
+/F1 10 Tf
+1 0 0 1 66 724 Tm
+(scripts\\adk.cmd init-env) Tj
+/F1 10 Tf
+1 0 0 1 66 710 Tm
+(scripts\\adk.cmd config) Tj
+/F1 10 Tf
+1 0 0 1 66 696 Tm
+(scripts\\adk.cmd web -Build) Tj
+/F1 10 Tf
+1 0 0 1 66 682 Tm
+(scripts\\adk.cmd api -Build) Tj
+/F1 10 Tf
+1 0 0 1 66 668 Tm
+(scripts\\adk.cmd test) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 626 Tm
+(macOS et Linux :) Tj
+/F1 10 Tf
+1 0 0 1 54 612 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 598 Tm
+([bash]) Tj
+/F1 10 Tf
+1 0 0 1 66 584 Tm
+(bash scripts/adk.sh init-env) Tj
+/F1 10 Tf
+1 0 0 1 66 570 Tm
+(bash scripts/adk.sh config) Tj
+/F1 10 Tf
+1 0 0 1 66 556 Tm
+(bash scripts/adk.sh web --build) Tj
+/F1 10 Tf
+1 0 0 1 66 542 Tm
+(bash scripts/adk.sh api --build) Tj
+/F1 10 Tf
+1 0 0 1 66 528 Tm
+(bash scripts/adk.sh test) Tj
+/F1 10 Tf
+1 0 0 1 54 514 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 500 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 486 Tm
+(5. Mode de développement quotidien avec ADK Web) Tj
+/F1 10 Tf
+1 0 0 1 54 468 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 454 Tm
+(Pour le développement au quotidien, démarrez d'abord l'interface web :) Tj
+/F1 10 Tf
+1 0 0 1 54 440 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 426 Tm
+([bash]) Tj
+/F1 10 Tf
+1 0 0 1 66 412 Tm
+(docker compose --profile web up --build market-analysis-web) Tj
+/F1 10 Tf
+1 0 0 1 54 398 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 384 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 370 Tm
+(Puis ouvrez :) Tj
+/F1 10 Tf
+1 0 0 1 54 356 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 342 Tm
+([text]) Tj
+/F1 10 Tf
+1 0 0 1 66 328 Tm
+(http://localhost:8001) Tj
+/F1 10 Tf
+1 0 0 1 54 314 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 300 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 286 Tm
+(Dans l'interface, sélectionnez l'application `ecommerce_agents`.) Tj
+/F1 10 Tf
+1 0 0 1 54 272 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 258 Tm
+(6. Mode de test API) Tj
+/F1 10 Tf
+1 0 0 1 54 240 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 226 Tm
+(Lorsque vous souhaitez valider le chemin d'intégration REST, démarrez le) Tj
+/F1 10 Tf
+1 0 0 1 54 212 Tm
+(serveur API :) Tj
+/F1 10 Tf
+1 0 0 1 54 198 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 184 Tm
+([bash]) Tj
+/F1 10 Tf
+1 0 0 1 66 170 Tm
+(docker compose up --build market-analysis-agent) Tj
+/F1 10 Tf
+1 0 0 1 54 156 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 142 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 128 Tm
+(Points d'entrée utiles :) Tj
+/F1 10 Tf
+1 0 0 1 54 114 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 100 Tm
+(• `http://localhost:8000/docs`) Tj
+/F1 10 Tf
+1 0 0 1 54 86 Tm
+(• `http://localhost:8000/list-apps`) Tj
+/F1 10 Tf
+1 0 0 1 54 72 Tm
+() Tj
+ET
+endstream
+endobj
+21 0 obj
+<< /Length 2314 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(`/list-apps` doit inclure `ecommerce_agents`.) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(Pour appeler l'API directement, utilisez :) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+([json]) Tj
+/F1 10 Tf
+1 0 0 1 66 668 Tm
+({) Tj
+/F1 10 Tf
+1 0 0 1 66 654 Tm
+(  "appName": "ecommerce_agents") Tj
+/F1 10 Tf
+1 0 0 1 66 640 Tm
+(}) Tj
+/F1 10 Tf
+1 0 0 1 54 626 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 612 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 598 Tm
+(Exemples représentatifs de corps de requête :) Tj
+/F1 10 Tf
+1 0 0 1 54 584 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 570 Tm
+(Créer une session :) Tj
+/F1 10 Tf
+1 0 0 1 54 556 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 542 Tm
+([json]) Tj
+/F1 10 Tf
+1 0 0 1 66 528 Tm
+({}) Tj
+/F1 10 Tf
+1 0 0 1 54 514 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 500 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 486 Tm
+(Lancer une analyse :) Tj
+/F1 10 Tf
+1 0 0 1 54 472 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 458 Tm
+([json]) Tj
+/F1 10 Tf
+1 0 0 1 66 444 Tm
+({) Tj
+/F1 10 Tf
+1 0 0 1 66 430 Tm
+(  "appName": "ecommerce_agents",) Tj
+/F1 10 Tf
+1 0 0 1 66 416 Tm
+(  "userId": "u_123",) Tj
+/F1 10 Tf
+1 0 0 1 66 402 Tm
+(  "sessionId": "s_123",) Tj
+/F1 10 Tf
+1 0 0 1 66 388 Tm
+(  "newMessage": {) Tj
+/F1 10 Tf
+1 0 0 1 66 374 Tm
+(    "role": "user",) Tj
+/F1 10 Tf
+1 0 0 1 66 360 Tm
+(    "parts": [) Tj
+/F1 10 Tf
+1 0 0 1 66 346 Tm
+(      {) Tj
+/F1 10 Tf
+1 0 0 1 66 332 Tm
+(        "text": "Analyze Dyson V15") Tj
+/F1 10 Tf
+1 0 0 1 66 318 Tm
+(      }) Tj
+/F1 10 Tf
+1 0 0 1 66 304 Tm
+(    ]) Tj
+/F1 10 Tf
+1 0 0 1 66 290 Tm
+(  }) Tj
+/F1 10 Tf
+1 0 0 1 66 276 Tm
+(}) Tj
+/F1 10 Tf
+1 0 0 1 54 262 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 248 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 234 Tm
+(Exemple représentatif de requête HTTP :) Tj
+/F1 10 Tf
+1 0 0 1 54 220 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 206 Tm
+([bash]) Tj
+/F1 10 Tf
+1 0 0 1 66 192 Tm
+(curl -X POST http://localhost:8000/run \\) Tj
+/F1 10 Tf
+1 0 0 1 66 178 Tm
+(  -H "Content-Type: application/json" \\) Tj
+/F1 10 Tf
+1 0 0 1 66 164 Tm
+(  -d '{) Tj
+/F1 10 Tf
+1 0 0 1 66 150 Tm
+(    "appName": "ecommerce_agents",) Tj
+/F1 10 Tf
+1 0 0 1 66 136 Tm
+(    "userId": "u_123",) Tj
+/F1 10 Tf
+1 0 0 1 66 122 Tm
+(    "sessionId": "s_123",) Tj
+/F1 10 Tf
+1 0 0 1 66 108 Tm
+(    "newMessage": {) Tj
+/F1 10 Tf
+1 0 0 1 66 94 Tm
+(      "role": "user",) Tj
+/F1 10 Tf
+1 0 0 1 66 80 Tm
+(      "parts": [) Tj
+ET
+endstream
+endobj
+22 0 obj
+<< /Length 3082 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 66 738 Tm
+(        {) Tj
+/F1 10 Tf
+1 0 0 1 66 724 Tm
+(          "text": "Analyze Dyson V15") Tj
+/F1 10 Tf
+1 0 0 1 66 710 Tm
+(        }) Tj
+/F1 10 Tf
+1 0 0 1 66 696 Tm
+(      ]) Tj
+/F1 10 Tf
+1 0 0 1 66 682 Tm
+(    }) Tj
+/F1 10 Tf
+1 0 0 1 66 668 Tm
+(  }') Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 626 Tm
+(7. Exécuter les tests dans le conteneur) Tj
+/F1 10 Tf
+1 0 0 1 54 608 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 594 Tm
+(Utilisez le service de test dédié :) Tj
+/F1 10 Tf
+1 0 0 1 54 580 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 566 Tm
+([bash]) Tj
+/F1 10 Tf
+1 0 0 1 66 552 Tm
+(docker compose --profile test run --rm market-analysis-test) Tj
+/F1 10 Tf
+1 0 0 1 54 538 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 524 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 510 Tm
+(ou exécutez les tests dans le conteneur web déjà lancé :) Tj
+/F1 10 Tf
+1 0 0 1 54 496 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 482 Tm
+([bash]) Tj
+/F1 10 Tf
+1 0 0 1 66 468 Tm
+(docker compose exec market-analysis-web pytest -q) Tj
+/F1 10 Tf
+1 0 0 1 54 454 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 440 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 426 Tm
+(8. Tests) Tj
+/F1 10 Tf
+1 0 0 1 54 408 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 394 Tm
+(La suite automatisée actuelle se concentre sur les parties de l'application les) Tj
+/F1 10 Tf
+1 0 0 1 54 380 Tm
+(plus importantes et les plus fragiles dans un workflow ADK multi-agents :) Tj
+/F1 10 Tf
+1 0 0 1 54 366 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 352 Tm
+(• la construction et le câblage des agents) Tj
+/F1 10 Tf
+1 0 0 1 54 338 Tm
+(• le parsing des requêtes et le routage) Tj
+/F1 10 Tf
+1 0 0 1 54 324 Tm
+(• le comportement de l'orchestrateur) Tj
+/F1 10 Tf
+1 0 0 1 54 310 Tm
+(• les sorties déterministes des outils et des providers) Tj
+/F1 10 Tf
+1 0 0 1 54 296 Tm
+(• la persistance durable en SQLite) Tj
+/F1 10 Tf
+1 0 0 1 54 282 Tm
+(• la présence minimale de la documentation du dépôt) Tj
+/F1 10 Tf
+1 0 0 1 54 268 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 254 Tm
+(Ces tests ont été choisis car ils protègent le chemin métier critique de) Tj
+/F1 10 Tf
+1 0 0 1 54 240 Tm
+(l'application. Si le câblage des agents casse, l'application ne démarre pas. Si) Tj
+/F1 10 Tf
+1 0 0 1 54 226 Tm
+(le routage casse, l'application pose la mauvaise question ou analyse le mauvais) Tj
+/F1 10 Tf
+1 0 0 1 54 212 Tm
+(produit. Si l'orchestration casse, la clarification, la découverte de) Tj
+/F1 10 Tf
+1 0 0 1 54 198 Tm
+(concurrents ou la synthèse finale peuvent échouer silencieusement. Si le) Tj
+/F1 10 Tf
+1 0 0 1 54 184 Tm
+(stockage casse, les analyses terminées sont perdues ou écrasées.) Tj
+/F1 10 Tf
+1 0 0 1 54 170 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 156 Tm
+(#### Pourquoi chaque groupe de tests est pertinent) Tj
+/F1 10 Tf
+1 0 0 1 54 142 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 128 Tm
+(• `tests/test_agent_definition.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 114 Tm
+(  - Vérifie que le graphe ADK s'importe correctement et que les agents attendus) Tj
+/F1 10 Tf
+1 0 0 1 54 100 Tm
+(    sont présents.) Tj
+/F1 10 Tf
+1 0 0 1 54 86 Tm
+(  - C'est pertinent car un mauvais câblage d'agent empêche tout le runtime de) Tj
+/F1 10 Tf
+1 0 0 1 54 72 Tm
+(    se charger.) Tj
+ET
+endstream
+endobj
+23 0 obj
+<< /Length 3981 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(• `tests/test_agent_orchestration.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(  - Vérifie le flux de l'orchestrateur personnalisé, en particulier les) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(    événements de progression et la branche de clarification.) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(  - C'est pertinent car l'orchestration constitue la logique centrale de) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(    l'application.) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+(• `tests/test_config.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+(  - Vérifie le modèle par défaut, le marché par défaut et le chemin SQLite.) Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+(  - C'est pertinent car des valeurs par défaut cassées font échouer le système) Tj
+/F1 10 Tf
+1 0 0 1 54 626 Tm
+(    avant même qu'une analyse ne puisse commencer.) Tj
+/F1 10 Tf
+1 0 0 1 54 612 Tm
+(• `tests/test_routing.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 598 Tm
+(  - Vérifie le parsing du périmètre, la détection de clarification, la gestion) Tj
+/F1 10 Tf
+1 0 0 1 54 584 Tm
+(    du JSON entre balises et les comportements de repli.) Tj
+/F1 10 Tf
+1 0 0 1 54 570 Tm
+(  - C'est pertinent car chaque requête passe d'abord par le routage.) Tj
+/F1 10 Tf
+1 0 0 1 54 556 Tm
+(• `tests/test_tools.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 542 Tm
+(  - Vérifie les wrappers d'outils de prix, d'avis, de sentiment et de tendance.) Tj
+/F1 10 Tf
+1 0 0 1 54 528 Tm
+(  - C'est pertinent car ces helpers définissent la structure attendue des) Tj
+/F1 10 Tf
+1 0 0 1 54 514 Tm
+(    données de marché aval.) Tj
+/F1 10 Tf
+1 0 0 1 54 500 Tm
+(• `tests/test_mock_providers.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 486 Tm
+(  - Vérifie les mock providers alimentés par fixtures.) Tj
+/F1 10 Tf
+1 0 0 1 54 472 Tm
+(  - C'est pertinent car ils fournissent une validation locale déterministe sans) Tj
+/F1 10 Tf
+1 0 0 1 54 458 Tm
+(    dépendre d'API externes.) Tj
+/F1 10 Tf
+1 0 0 1 54 444 Tm
+(• `tests/test_storage.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 430 Tm
+(  - Vérifie la création des snapshots et le comportement save/read en SQLite.) Tj
+/F1 10 Tf
+1 0 0 1 54 416 Tm
+(  - C'est pertinent car les analyses terminées doivent maintenant être stockées) Tj
+/F1 10 Tf
+1 0 0 1 54 402 Tm
+(    durablement.) Tj
+/F1 10 Tf
+1 0 0 1 54 388 Tm
+(• `tests/test_persistence_flow.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 374 Tm
+(  - Vérifie les règles de persistance de bout en bout pilotées par) Tj
+/F1 10 Tf
+1 0 0 1 54 360 Tm
+(    l'orchestrateur.) Tj
+/F1 10 Tf
+1 0 0 1 54 346 Tm
+(  - C'est pertinent car les runs réussis doivent être persistés, les runs de) Tj
+/F1 10 Tf
+1 0 0 1 54 332 Tm
+(    clarification seuls ne doivent pas l'être, et les échecs de stockage ne) Tj
+/F1 10 Tf
+1 0 0 1 54 318 Tm
+(    doivent pas bloquer la réponse finale.) Tj
+/F1 10 Tf
+1 0 0 1 54 304 Tm
+(• `tests/test_readme_exists.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 290 Tm
+(  - Vérifie que le dépôt contient toujours son fichier principal de) Tj
+/F1 10 Tf
+1 0 0 1 54 276 Tm
+(    documentation.) Tj
+/F1 10 Tf
+1 0 0 1 54 262 Tm
+(  - C'est pertinent car le test demande une soumission exécutable et documentée.) Tj
+/F1 10 Tf
+1 0 0 1 54 248 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 234 Tm
+(#### Tests automatisés déclarés) Tj
+/F1 10 Tf
+1 0 0 1 54 220 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 206 Tm
+(• `tests/test_agent_definition.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 192 Tm
+(  - `test_root_agent_and_parallel_research_agents_import_cleanly`) Tj
+/F1 10 Tf
+1 0 0 1 54 178 Tm
+(• `tests/test_agent_orchestration.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 164 Tm
+(  - `test_internal_research_events_are_hidden_but_progress_is_visible`) Tj
+/F1 10 Tf
+1 0 0 1 54 150 Tm
+(  - `test_clarification_branch_keeps_follow_up_visible`) Tj
+/F1 10 Tf
+1 0 0 1 54 136 Tm
+(• `tests/test_config.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 122 Tm
+(  - `test_default_market_matches_architecture_examples`) Tj
+/F1 10 Tf
+1 0 0 1 54 108 Tm
+(  - `test_default_model_uses_gemini_3_1_pro_preview_for_search_grounding`) Tj
+/F1 10 Tf
+1 0 0 1 54 94 Tm
+(  - `test_analysis_db_path_defaults_to_repo_local_adk_storage`) Tj
+/F1 10 Tf
+1 0 0 1 54 80 Tm
+(• `tests/test_routing.py`) Tj
+ET
+endstream
+endobj
+24 0 obj
+<< /Length 3925 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(  - `test_greeting_scope_requires_clarification`) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(  - `test_valid_scope_continues_research`) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(  - `test_parse_research_scope_accepts_fenced_json`) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(  - `test_invalid_scope_defaults_to_clarification`) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(• `tests/test_mode.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+(  - `test_normalize_mode_accepts_supported_values_case_insensitively`) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+(  - `test_extract_mode_and_clean_text_handles_inline_mode_selection`) Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+(  - `test_extract_mode_and_clean_text_handles_mode_only_messages`) Tj
+/F1 10 Tf
+1 0 0 1 54 626 Tm
+(  - `test_mode_messages_reflect_live_key_availability`) Tj
+/F1 10 Tf
+1 0 0 1 54 612 Tm
+(• `tests/test_mock_providers.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 598 Tm
+(  - `test_mock_pricing_provider_returns_products`) Tj
+/F1 10 Tf
+1 0 0 1 54 584 Tm
+(  - `test_mock_review_provider_injects_product_name`) Tj
+/F1 10 Tf
+1 0 0 1 54 570 Tm
+(  - `test_mock_trend_provider_formats_summary`) Tj
+/F1 10 Tf
+1 0 0 1 54 556 Tm
+(• `tests/test_tools.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 542 Tm
+(  - `test_pricing_intelligence_wraps_provider_payload`) Tj
+/F1 10 Tf
+1 0 0 1 54 528 Tm
+(  - `test_review_corpus_returns_reviews_by_product`) Tj
+/F1 10 Tf
+1 0 0 1 54 514 Tm
+(  - `test_review_sentiment_returns_product_summaries`) Tj
+/F1 10 Tf
+1 0 0 1 54 500 Tm
+(  - `test_trend_signals_returns_category_context`) Tj
+/F1 10 Tf
+1 0 0 1 54 486 Tm
+(• `tests/test_storage.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 472 Tm
+(  - `test_build_analysis_snapshot_extracts_scope_report_and_citations`) Tj
+/F1 10 Tf
+1 0 0 1 54 458 Tm
+(  - `test_sqlite_analysis_store_round_trips_snapshots_and_filters_recent`) Tj
+/F1 10 Tf
+1 0 0 1 54 444 Tm
+(  - `test_sqlite_analysis_store_keeps_multiple_runs_for_same_session`) Tj
+/F1 10 Tf
+1 0 0 1 54 430 Tm
+(• `tests/test_persistence_flow.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 416 Tm
+(  - `test_build_analysis_snapshot_from_context_reads_final_report_and_request`) Tj
+/F1 10 Tf
+1 0 0 1 54 402 Tm
+(  - `test_full_run_persists_completed_analysis_snapshot`) Tj
+/F1 10 Tf
+1 0 0 1 54 388 Tm
+(  - `test_clarification_path_does_not_persist_analysis`) Tj
+/F1 10 Tf
+1 0 0 1 54 374 Tm
+(  - `test_persistence_failure_keeps_final_report_in_event_stream`) Tj
+/F1 10 Tf
+1 0 0 1 54 360 Tm
+(• `tests/test_readme_exists.py`) Tj
+/F1 10 Tf
+1 0 0 1 54 346 Tm
+(  - `test_readme_exists`) Tj
+/F1 10 Tf
+1 0 0 1 54 332 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 318 Tm
+(`tests/test_mode.py` couvre un petit helper de parsing conservé d'une) Tj
+/F1 10 Tf
+1 0 0 1 54 304 Tm
+(exploration précédente autour d'une sélection de mode dans l'interface. Il ne) Tj
+/F1 10 Tf
+1 0 0 1 54 290 Tm
+(fait actuellement pas partie du chemin d'exécution actif de `root_agent`, et) Tj
+/F1 10 Tf
+1 0 0 1 54 276 Tm
+(doit donc être interprété comme une couverture utilitaire stable plutôt que) Tj
+/F1 10 Tf
+1 0 0 1 54 262 Tm
+(comme un test du chemin d'exécution principal.) Tj
+/F1 10 Tf
+1 0 0 1 54 248 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 234 Tm
+(#### Tests manuels) Tj
+/F1 10 Tf
+1 0 0 1 54 220 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 206 Tm
+(Ces vérifications manuelles complètent les tests automatisés en confirmant que) Tj
+/F1 10 Tf
+1 0 0 1 54 192 Tm
+(le runtime containerisé et les interfaces ADK fonctionnent de bout en bout :) Tj
+/F1 10 Tf
+1 0 0 1 54 178 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 164 Tm
+(1. Valider Compose avec `docker compose config`.) Tj
+/F1 10 Tf
+1 0 0 1 54 150 Tm
+(2. Démarrer l'interface ADK web avec `docker compose --profile web up --build market-) Tj
+/F1 10 Tf
+1 0 0 1 54 136 Tm
+(analysis-web`.) Tj
+/F1 10 Tf
+1 0 0 1 54 122 Tm
+(3. Ouvrir `http://localhost:8001`.) Tj
+/F1 10 Tf
+1 0 0 1 54 108 Tm
+(4. Créer une session dans l'interface ADK web.) Tj
+/F1 10 Tf
+1 0 0 1 54 94 Tm
+(5. Envoyer une demande d'analyse et inspecter l'état ainsi que l'historique des) Tj
+/F1 10 Tf
+1 0 0 1 54 80 Tm
+(événements.) Tj
+ET
+endstream
+endobj
+25 0 obj
+<< /Length 3500 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(6. Démarrer le serveur API ADK avec `docker compose up --build market-analysis-agent`.) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(7. Créer une session via l'API avec un corps JSON vide.) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(8. Lancer une analyse via `/run` avec le corps de requête montré dans la section API ci-) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(dessus.) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(9. Exécuter la suite automatisée containerisée avec `docker compose --profile test run) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+(--rm market-analysis-test`.) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 640 Tm
+(Gestion des erreurs) Tj
+/F1 10 Tf
+1 0 0 1 54 620 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 606 Tm
+(L'implémentation actuelle inclut quelques décisions explicites de gestion) Tj
+/F1 10 Tf
+1 0 0 1 54 592 Tm
+(d'erreurs qui sont importantes à connaître pour le reviewer :) Tj
+/F1 10 Tf
+1 0 0 1 54 578 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 564 Tm
+(• si le périmètre de recherche est ambigu, le système revient à une question de) Tj
+/F1 10 Tf
+1 0 0 1 54 550 Tm
+(  clarification plutôt que de générer un rapport faible) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+(• les runs qui se limitent à une clarification ne sont pas persistés dans le) Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+(  stockage durable) Tj
+/F1 10 Tf
+1 0 0 1 54 508 Tm
+(• les échecs de persistance sont journalisés, mais ne bloquent pas le retour du) Tj
+/F1 10 Tf
+1 0 0 1 54 494 Tm
+(  rapport final côté utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 480 Tm
+(• une sortie structurée invalide ou non parsable pour le périmètre retombe de) Tj
+/F1 10 Tf
+1 0 0 1 54 466 Tm
+(  manière sûre sur le comportement de clarification) Tj
+/F1 10 Tf
+1 0 0 1 54 452 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 438 Tm
+(Ces choix sont importants car ils favorisent une expérience utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 424 Tm
+(prévisible et réduisent le risque de stocker silencieusement des analyses) Tj
+/F1 10 Tf
+1 0 0 1 54 410 Tm
+(incomplètes ou de faible confiance.) Tj
+/F1 10 Tf
+1 0 0 1 54 396 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 382 Tm
+(Étape 4. Architecture de données et stockage) Tj
+/F1 10 Tf
+1 0 0 1 54 362 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 348 Tm
+(Cette section répond à la question du test sur la manière de stocker les) Tj
+/F1 10 Tf
+1 0 0 1 54 334 Tm
+(données et sur le pourquoi de ce choix.) Tj
+/F1 10 Tf
+1 0 0 1 54 320 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 306 Tm
+(Approche actuellement implémentée) Tj
+/F1 10 Tf
+1 0 0 1 54 288 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 274 Tm
+(Le code actuel utilise un modèle de stockage à deux niveaux :) Tj
+/F1 10 Tf
+1 0 0 1 54 260 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 246 Tm
+(• les sorties transitoires des agents restent dans l'état de session ADK) Tj
+/F1 10 Tf
+1 0 0 1 54 232 Tm
+(• les analyses terminées sont persistées dans SQLite, car cela permet de garder) Tj
+/F1 10 Tf
+1 0 0 1 54 218 Tm
+(  le projet simple, exécutable et facile à évaluer) Tj
+/F1 10 Tf
+1 0 0 1 54 204 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 190 Tm
+(Ce choix est justifié car ces deux classes de données n'ont pas le même cycle) Tj
+/F1 10 Tf
+1 0 0 1 54 176 Tm
+(de vie :) Tj
+/F1 10 Tf
+1 0 0 1 54 162 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 148 Tm
+(• l'état de session est idéal pour le contexte d'orchestration court pendant un) Tj
+/F1 10 Tf
+1 0 0 1 54 134 Tm
+(  run) Tj
+/F1 10 Tf
+1 0 0 1 54 120 Tm
+(• l'historique durable des analyses exige des enregistrements stables qui) Tj
+/F1 10 Tf
+1 0 0 1 54 106 Tm
+(  survivent aux redémarrages du processus) Tj
+/F1 10 Tf
+1 0 0 1 54 92 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 78 Tm
+(Modèle de données) Tj
+ET
+endstream
+endobj
+26 0 obj
+<< /Length 3429 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(L'enregistrement durable d'analyse stocke :) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+(Champ | Rôle) Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(--- | ---) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+(`analysis_id` | Identifiant stable d'un run terminé) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+(`session_id` | Regroupement au niveau session) Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+(`user_id` | Regroupement au niveau utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 626 Tm
+(`created_at` | Horodatage du run) Tj
+/F1 10 Tf
+1 0 0 1 54 612 Tm
+(`request_text` | Texte de la demande d'origine) Tj
+/F1 10 Tf
+1 0 0 1 54 598 Tm
+(`product_name` | Produit principal normalisé) Tj
+/F1 10 Tf
+1 0 0 1 54 584 Tm
+(`category` | Catégorie normalisée) Tj
+/F1 10 Tf
+1 0 0 1 54 570 Tm
+(`market` | Marché normalisé) Tj
+/F1 10 Tf
+1 0 0 1 54 556 Tm
+(`status` | Statut de l'enregistrement durable) Tj
+/F1 10 Tf
+1 0 0 1 54 542 Tm
+(`final_report_markdown` | Rapport final présenté à l'utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 528 Tm
+(`state_snapshot_json` | Snapshot JSON des résultats intermédiaires clés) Tj
+/F1 10 Tf
+1 0 0 1 54 514 Tm
+(`citations_json` | URL sources extraites) Tj
+/F1 10 Tf
+1 0 0 1 54 500 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 486 Tm
+(Architecture recommandée en production) Tj
+/F1 10 Tf
+1 0 0 1 54 468 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 454 Tm
+(Pour une version production, je passerais probablement de SQLite à une base de) Tj
+/F1 10 Tf
+1 0 0 1 54 440 Tm
+(données orientée document. La raison principale est que l'application produit) Tj
+/F1 10 Tf
+1 0 0 1 54 426 Tm
+(déjà des sorties imbriquées au format JSON, comme le périmètre de recherche,) Tj
+/F1 10 Tf
+1 0 0 1 54 412 Tm
+(l'ensemble des concurrents, l'intelligence prix, le sentiment issu des avis,) Tj
+/F1 10 Tf
+1 0 0 1 54 398 Tm
+(les signaux de tendance, les citations et le snapshot du rapport final. Un) Tj
+/F1 10 Tf
+1 0 0 1 54 384 Tm
+(stockage orienté document épouse naturellement cette structure, réduit le besoin) Tj
+/F1 10 Tf
+1 0 0 1 54 370 Tm
+(de transformer ou aplatir les payloads dans de nombreuses tables relationnelles,) Tj
+/F1 10 Tf
+1 0 0 1 54 356 Tm
+(et facilite l'évolution de schéma lorsque les sorties des agents changent dans) Tj
+/F1 10 Tf
+1 0 0 1 54 342 Tm
+(le temps.) Tj
+/F1 10 Tf
+1 0 0 1 54 328 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 314 Tm
+(Ce choix réduit également le décalage de modèle entre l'état de session ADK en) Tj
+/F1 10 Tf
+1 0 0 1 54 300 Tm
+(mémoire et le modèle de persistance durable.) Tj
+/F1 10 Tf
+1 0 0 1 54 286 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 272 Tm
+(Étape 5. Monitoring et observabilité) Tj
+/F1 10 Tf
+1 0 0 1 54 252 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 238 Tm
+(Cette section répond à la question du test sur le tracing, les métriques, les) Tj
+/F1 10 Tf
+1 0 0 1 54 224 Tm
+(alertes et la qualité des sorties.) Tj
+/F1 10 Tf
+1 0 0 1 54 210 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 196 Tm
+(Approche de tracing) Tj
+/F1 10 Tf
+1 0 0 1 54 178 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 164 Tm
+(Je tracerais chaque analyse comme un span parent avec des spans enfants pour :) Tj
+/F1 10 Tf
+1 0 0 1 54 150 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 136 Tm
+(• la résolution du périmètre de recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 122 Tm
+(• la branche de clarification lorsqu'elle est déclenchée) Tj
+/F1 10 Tf
+1 0 0 1 54 108 Tm
+(• la découverte des concurrents) Tj
+/F1 10 Tf
+1 0 0 1 54 94 Tm
+(• chaque branche de recherche parallèle) Tj
+/F1 10 Tf
+1 0 0 1 54 80 Tm
+(• la synthèse finale) Tj
+ET
+endstream
+endobj
+27 0 obj
+<< /Length 2836 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(• la persistance) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(Chaque span devrait inclure :) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 682 Tm
+(• `analysis_id`) Tj
+/F1 10 Tf
+1 0 0 1 54 668 Tm
+(• `session_id`) Tj
+/F1 10 Tf
+1 0 0 1 54 654 Tm
+(• `user_id`) Tj
+/F1 10 Tf
+1 0 0 1 54 640 Tm
+(• le nom du modèle) Tj
+/F1 10 Tf
+1 0 0 1 54 626 Tm
+(• le marché) Tj
+/F1 10 Tf
+1 0 0 1 54 612 Tm
+(• la catégorie produit) Tj
+/F1 10 Tf
+1 0 0 1 54 598 Tm
+(• l'état de succès ou d'échec) Tj
+/F1 10 Tf
+1 0 0 1 54 584 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 570 Tm
+(Métriques de performance) Tj
+/F1 10 Tf
+1 0 0 1 54 552 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 538 Tm
+(Les métriques opérationnelles les plus utiles sont :) Tj
+/F1 10 Tf
+1 0 0 1 54 524 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 510 Tm
+(• la latence totale d'analyse) Tj
+/F1 10 Tf
+1 0 0 1 54 496 Tm
+(• la latence par étape) Tj
+/F1 10 Tf
+1 0 0 1 54 482 Tm
+(• le taux de succès) Tj
+/F1 10 Tf
+1 0 0 1 54 468 Tm
+(• le taux de clarification) Tj
+/F1 10 Tf
+1 0 0 1 54 454 Tm
+(• le taux d'échec de persistance) Tj
+/F1 10 Tf
+1 0 0 1 54 440 Tm
+(• le nombre moyen de citations par rapport) Tj
+/F1 10 Tf
+1 0 0 1 54 426 Tm
+(• l'usage de tokens et le coût estimé des modèles par run) Tj
+/F1 10 Tf
+1 0 0 1 54 412 Tm
+(• le pourcentage de runs où une ou plusieurs branches manquent leur sortie) Tj
+/F1 10 Tf
+1 0 0 1 54 398 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 384 Tm
+(Stratégie d'alerte) Tj
+/F1 10 Tf
+1 0 0 1 54 366 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 352 Tm
+(J'alerterais sur :) Tj
+/F1 10 Tf
+1 0 0 1 54 338 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 324 Tm
+(• un taux d'échec soutenu au-dessus d'un seuil) Tj
+/F1 10 Tf
+1 0 0 1 54 310 Tm
+(• des échecs de persistance au-dessus d'un seuil) Tj
+/F1 10 Tf
+1 0 0 1 54 296 Tm
+(• des timeouts d'étape ou des latences anormalement hautes) Tj
+/F1 10 Tf
+1 0 0 1 54 282 Tm
+(• des rapports finaux vides ou quasi vides) Tj
+/F1 10 Tf
+1 0 0 1 54 268 Tm
+(• une chute brutale du nombre de citations ou du taux de complétion des) Tj
+/F1 10 Tf
+1 0 0 1 54 254 Tm
+(  branches) Tj
+/F1 10 Tf
+1 0 0 1 54 240 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 226 Tm
+(Mesure de la qualité des sorties) Tj
+/F1 10 Tf
+1 0 0 1 54 208 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 194 Tm
+(Je suivrais la qualité avec :) Tj
+/F1 10 Tf
+1 0 0 1 54 180 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 166 Tm
+(• le nombre de citations et la couverture des citations par section) Tj
+/F1 10 Tf
+1 0 0 1 54 152 Tm
+(• la complétude de schéma des sorties d'état) Tj
+/F1 10 Tf
+1 0 0 1 54 138 Tm
+(• les scores de feedback utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 124 Tm
+(• des revues humaines périodiques d'un échantillon de rapports) Tj
+/F1 10 Tf
+1 0 0 1 54 110 Tm
+(• une évaluation automatisée de type LLM-as-judge sur la pertinence, la) Tj
+/F1 10 Tf
+1 0 0 1 54 96 Tm
+(  complétude et le caractère actionnable) Tj
+/F1 10 Tf
+1 0 0 1 54 82 Tm
+() Tj
+ET
+endstream
+endobj
+28 0 obj
+<< /Length 3308 >>
+stream
+BT
+/F2 13 Tf
+1 0 0 1 54 738 Tm
+(Étape 6. Passage à l'échelle et optimisation) Tj
+/F1 10 Tf
+1 0 0 1 54 718 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 704 Tm
+(Cette section répond à la question du test sur la concurrence, les coûts, le) Tj
+/F1 10 Tf
+1 0 0 1 54 690 Tm
+(cache et la parallélisation.) Tj
+/F1 10 Tf
+1 0 0 1 54 676 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 662 Tm
+(Gérer 100+ analyses simultanées) Tj
+/F1 10 Tf
+1 0 0 1 54 644 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 630 Tm
+(En cas de charge significative, je séparerais la couche API synchrone des) Tj
+/F1 10 Tf
+1 0 0 1 54 616 Tm
+(workers d'exécution :) Tj
+/F1 10 Tf
+1 0 0 1 54 602 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 588 Tm
+(• le service API accepte les requêtes et crée des jobs) Tj
+/F1 10 Tf
+1 0 0 1 54 574 Tm
+(• une file distribue les jobs vers les conteneurs workers) Tj
+/F1 10 Tf
+1 0 0 1 54 560 Tm
+(• les workers exécutent l'orchestrateur et écrivent la progression puis les) Tj
+/F1 10 Tf
+1 0 0 1 54 546 Tm
+(  résultats finaux) Tj
+/F1 10 Tf
+1 0 0 1 54 532 Tm
+(• l'autoscaling est piloté par la profondeur de la file et la latence moyenne) Tj
+/F1 10 Tf
+1 0 0 1 54 518 Tm
+(  d'exécution) Tj
+/F1 10 Tf
+1 0 0 1 54 504 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 490 Tm
+(Optimisation des coûts) Tj
+/F1 10 Tf
+1 0 0 1 54 472 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 458 Tm
+(Les contrôles de coût les plus forts sont :) Tj
+/F1 10 Tf
+1 0 0 1 54 444 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 430 Tm
+(• une clarification précoce avant la recherche aval coûteuse, déjà en place) Tj
+/F1 10 Tf
+1 0 0 1 54 416 Tm
+(• le cache des recherches répétées sur produit et concurrents avec fenêtres de) Tj
+/F1 10 Tf
+1 0 0 1 54 402 Tm
+(  fraîcheur) Tj
+/F1 10 Tf
+1 0 0 1 54 388 Tm
+(• la réutilisation des ensembles de concurrents normalisés pour les produits) Tj
+/F1 10 Tf
+1 0 0 1 54 374 Tm
+(  répétés sur le même marché) Tj
+/F1 10 Tf
+1 0 0 1 54 360 Tm
+(• des limites strictes sur la profondeur de recherche et la longueur du rapport) Tj
+/F1 10 Tf
+1 0 0 1 54 346 Tm
+(• le routage des seules étapes à forte valeur vers les modèles les plus coûteux) Tj
+/F1 10 Tf
+1 0 0 1 54 332 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 318 Tm
+(Cache intelligent) Tj
+/F1 10 Tf
+1 0 0 1 54 300 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 286 Tm
+(Je mettrais en cache :) Tj
+/F1 10 Tf
+1 0 0 1 54 272 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 258 Tm
+(• les périmètres de recherche normalisés par signature de requête) Tj
+/F1 10 Tf
+1 0 0 1 54 244 Tm
+(• les ensembles de concurrents par produit canonique et marché) Tj
+/F1 10 Tf
+1 0 0 1 54 230 Tm
+(• les résultats d'outils ou de recherche par produit, marché et fenêtre de) Tj
+/F1 10 Tf
+1 0 0 1 54 216 Tm
+(  fraîcheur) Tj
+/F1 10 Tf
+1 0 0 1 54 202 Tm
+(• les rapports finaux uniquement lorsque la requête est identique et que la) Tj
+/F1 10 Tf
+1 0 0 1 54 188 Tm
+(  fraîcheur reste acceptable) Tj
+/F1 10 Tf
+1 0 0 1 54 174 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 160 Tm
+(Stratégie de parallélisation) Tj
+/F1 10 Tf
+1 0 0 1 54 142 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 128 Tm
+(Le code actuel utilise déjà un `ParallelAgent` pour les branches de recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 114 Tm
+(indépendantes. C'est le bon pattern car les prix, les preuves issues des avis,) Tj
+/F1 10 Tf
+1 0 0 1 54 100 Tm
+(le sentiment et les tendances peuvent s'exécuter en parallèle une fois la) Tj
+/F1 10 Tf
+1 0 0 1 54 86 Tm
+(découverte des concurrents stabilisée.) Tj
+/F1 10 Tf
+1 0 0 1 54 72 Tm
+() Tj
+ET
+endstream
+endobj
+29 0 obj
+<< /Length 3433 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(Pour une plus grande échelle, je conserverais cette même séparation logique,) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+(mais avec des workers de branche pilotés par file et des limites de débit par) Tj
+/F1 10 Tf
+1 0 0 1 54 710 Tm
+(provider.) Tj
+/F1 10 Tf
+1 0 0 1 54 696 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 682 Tm
+(Limites connues) Tj
+/F1 10 Tf
+1 0 0 1 54 662 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 648 Tm
+(La soumission actuelle est volontairement cadrée pour rester exécutable,) Tj
+/F1 10 Tf
+1 0 0 1 54 634 Tm
+(évaluable et centrée sur l'orchestration. Les reviewers doivent garder en tête) Tj
+/F1 10 Tf
+1 0 0 1 54 620 Tm
+(les limites suivantes :) Tj
+/F1 10 Tf
+1 0 0 1 54 606 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 592 Tm
+(• l'analyse en direct dépend d'une clé API Gemini valide) Tj
+/F1 10 Tf
+1 0 0 1 54 578 Tm
+(• les sorties ancrées sur la recherche en direct dépendent de la disponibilité) Tj
+/F1 10 Tf
+1 0 0 1 54 564 Tm
+(  et de la fraîcheur des résultats externes) Tj
+/F1 10 Tf
+1 0 0 1 54 550 Tm
+(• la couche d'outils Python spécialisés est implémentée et testée, mais le) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+(  runtime live actif utilise actuellement des agents spécialisés ancrés sur la) Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+(  recherche plutôt que les fonctions-outils locales pour l'exécution de bout en) Tj
+/F1 10 Tf
+1 0 0 1 54 508 Tm
+(  bout) Tj
+/F1 10 Tf
+1 0 0 1 54 494 Tm
+(• le monitoring production, l'autoscaling et l'évaluation A/B sont documentés) Tj
+/F1 10 Tf
+1 0 0 1 54 480 Tm
+(  dans ce README comme recommandations de conception, et non comme une) Tj
+/F1 10 Tf
+1 0 0 1 54 466 Tm
+(  infrastructure déjà entièrement livrée) Tj
+/F1 10 Tf
+1 0 0 1 54 452 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 438 Tm
+(Étape 7. Amélioration continue et A/B testing) Tj
+/F1 10 Tf
+1 0 0 1 54 418 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 404 Tm
+(Cette section répond à la question du test sur l'évaluation de qualité, la) Tj
+/F1 10 Tf
+1 0 0 1 54 390 Tm
+(comparaison de prompts, le feedback utilisateur et l'évolution des capacités.) Tj
+/F1 10 Tf
+1 0 0 1 54 376 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 362 Tm
+(Évaluation automatique de la qualité) Tj
+/F1 10 Tf
+1 0 0 1 54 344 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 330 Tm
+(J'utiliserais une boucle qualité à deux niveaux :) Tj
+/F1 10 Tf
+1 0 0 1 54 316 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 302 Tm
+(• des vérifications déterministes sur la complétude de schéma, l'absence de) Tj
+/F1 10 Tf
+1 0 0 1 54 288 Tm
+(  citations et la couverture des sections du rapport) Tj
+/F1 10 Tf
+1 0 0 1 54 274 Tm
+(• une évaluation de type LLM-as-judge sur l'utilité stratégique, l'ancrage) Tj
+/F1 10 Tf
+1 0 0 1 54 260 Tm
+(  factuel, la clarté et la qualité des recommandations) Tj
+/F1 10 Tf
+1 0 0 1 54 246 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 232 Tm
+(Expérimentation sur les prompts) Tj
+/F1 10 Tf
+1 0 0 1 54 214 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 200 Tm
+(Les changements de prompts devraient être versionnés explicitement. Je) Tj
+/F1 10 Tf
+1 0 0 1 54 186 Tm
+(comparerais les versions de prompts sur un benchmark fixe de requêtes produits) Tj
+/F1 10 Tf
+1 0 0 1 54 172 Tm
+(représentatives et je suivrais :) Tj
+/F1 10 Tf
+1 0 0 1 54 158 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 144 Tm
+(• la latence) Tj
+/F1 10 Tf
+1 0 0 1 54 130 Tm
+(• le coût en tokens) Tj
+/F1 10 Tf
+1 0 0 1 54 116 Tm
+(• la couverture de citations) Tj
+/F1 10 Tf
+1 0 0 1 54 102 Tm
+(• le score du judge) Tj
+/F1 10 Tf
+1 0 0 1 54 88 Tm
+(• la préférence humaine sur des sorties échantillonnées) Tj
+/F1 10 Tf
+1 0 0 1 54 74 Tm
+() Tj
+ET
+endstream
+endobj
+30 0 obj
+<< /Length 3690 >>
+stream
+BT
+/F2 13 Tf
+1 0 0 1 54 738 Tm
+(Boucle de feedback utilisateur) Tj
+/F1 10 Tf
+1 0 0 1 54 720 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 706 Tm
+(Les signaux de feedback légers les plus utiles sont :) Tj
+/F1 10 Tf
+1 0 0 1 54 692 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 678 Tm
+(• un pouce haut ou bas sur le rapport final) Tj
+/F1 10 Tf
+1 0 0 1 54 664 Tm
+(• un commentaire libre facultatif) Tj
+/F1 10 Tf
+1 0 0 1 54 650 Tm
+(• le fait que l'utilisateur demande une régénération ou une clarification) Tj
+/F1 10 Tf
+1 0 0 1 54 636 Tm
+(• le fait que l'utilisateur exporte ou revisite le résultat plus tard) Tj
+/F1 10 Tf
+1 0 0 1 54 622 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 608 Tm
+(Évolution des capacités) Tj
+/F1 10 Tf
+1 0 0 1 54 590 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 576 Tm
+(J'améliorerais le système dans cet ordre :) Tj
+/F1 10 Tf
+1 0 0 1 54 562 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 548 Tm
+(1. renforcer la conservation des sources et les citations) Tj
+/F1 10 Tf
+1 0 0 1 54 534 Tm
+(2. remplacer les branches les plus utiles aujourd'hui simulées ou trop) Tj
+/F1 10 Tf
+1 0 0 1 54 520 Tm
+(   dépendantes de la recherche par des providers de données structurées) Tj
+/F1 10 Tf
+1 0 0 1 54 506 Tm
+(3. ajouter un score de confiance et de fraîcheur au rapport final) Tj
+/F1 10 Tf
+1 0 0 1 54 492 Tm
+(4. introduire des datasets de benchmark et une évaluation de régression avant) Tj
+/F1 10 Tf
+1 0 0 1 54 478 Tm
+(   chaque release) Tj
+/F1 10 Tf
+1 0 0 1 54 464 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 450 Tm
+(Prochaines étapes de développement) Tj
+/F1 10 Tf
+1 0 0 1 54 430 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 416 Tm
+(Les prochaines étapes les plus utiles maintenant que le flux de recherche en) Tj
+/F1 10 Tf
+1 0 0 1 54 402 Tm
+(direct parallèle est en place sont :) Tj
+/F1 10 Tf
+1 0 0 1 54 388 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 374 Tm
+(1. conserver les URL sources et améliorer les citations de chaque branche de) Tj
+/F1 10 Tf
+1 0 0 1 54 360 Tm
+(   recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 346 Tm
+(2. ajouter des tests de bout en bout autour de la clarification, de la) Tj
+/F1 10 Tf
+1 0 0 1 54 332 Tm
+(   découverte des concurrents et de la synthèse) Tj
+/F1 10 Tf
+1 0 0 1 54 318 Tm
+(3. décider quelles branches doivent rester orientées recherche et lesquelles) Tj
+/F1 10 Tf
+1 0 0 1 54 304 Tm
+(   doivent basculer vers des collecteurs connectés à des API) Tj
+/F1 10 Tf
+1 0 0 1 54 290 Tm
+(4. ajouter des scores explicites de fraîcheur et de confiance dans le rapport) Tj
+/F1 10 Tf
+1 0 0 1 54 276 Tm
+(   final) Tj
+/F1 10 Tf
+1 0 0 1 54 262 Tm
+(5. garder la couche d'outils alimentée par fixtures alignée avec les sorties du) Tj
+/F1 10 Tf
+1 0 0 1 54 248 Tm
+(   runtime live, ou la retirer si elle cesse d'apporter de la valeur) Tj
+/F1 10 Tf
+1 0 0 1 54 234 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 220 Tm
+(Trade-offs) Tj
+/F1 10 Tf
+1 0 0 1 54 200 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 186 Tm
+(• Un workflow multi-agents est plus verbeux qu'un agent unique, mais il est) Tj
+/F1 10 Tf
+1 0 0 1 54 172 Tm
+(  plus facile à tester, inspecter et raisonner.) Tj
+/F1 10 Tf
+1 0 0 1 54 158 Tm
+(• Un agent de clarification dédié ajoute une étape supplémentaire, mais il rend) Tj
+/F1 10 Tf
+1 0 0 1 54 144 Tm
+(  les suivis utilisateur plus propres et plus prévisibles.) Tj
+/F1 10 Tf
+1 0 0 1 54 130 Tm
+(• La recherche parallèle améliore la latence, mais les branches ne partagent pas) Tj
+/F1 10 Tf
+1 0 0 1 54 116 Tm
+(  automatiquement leur raisonnement intermédiaire pendant l'exécution.) Tj
+/F1 10 Tf
+1 0 0 1 54 102 Tm
+(• Le sentiment basé sur la recherche est flexible, mais moins déterministe qu'un) Tj
+/F1 10 Tf
+1 0 0 1 54 88 Tm
+(  sentiment calculé à partir d'un corpus d'avis unique et normalisé.) Tj
+/F1 10 Tf
+1 0 0 1 54 74 Tm
+(• Garder des outils anciens et des mock providers aide les tests, mais crée une) Tj
+ET
+endstream
+endobj
+31 0 obj
+<< /Length 1403 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738 Tm
+(  obligation de maintenance pour conserver l'alignement avec le runtime live.) Tj
+/F1 10 Tf
+1 0 0 1 54 724 Tm
+() Tj
+/F2 13 Tf
+1 0 0 1 54 710 Tm
+(Synthèse) Tj
+/F1 10 Tf
+1 0 0 1 54 690 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 676 Tm
+(L'architecture la plus adaptée actuellement pour ce dépôt est :) Tj
+/F1 10 Tf
+1 0 0 1 54 662 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 648 Tm
+(• une expérience utilisateur simple) Tj
+/F1 10 Tf
+1 0 0 1 54 634 Tm
+(• un orchestrateur ADK personnalisé pour la logique de branchement) Tj
+/F1 10 Tf
+1 0 0 1 54 620 Tm
+(• une étape de cadrage de recherche capable d'utiliser la recherche) Tj
+/F1 10 Tf
+1 0 0 1 54 606 Tm
+(• une étape de clarification dédiée) Tj
+/F1 10 Tf
+1 0 0 1 54 592 Tm
+(• une découverte automatique des concurrents) Tj
+/F1 10 Tf
+1 0 0 1 54 578 Tm
+(• une étape de recherche de marché en direct parallèle pour des branches) Tj
+/F1 10 Tf
+1 0 0 1 54 564 Tm
+(  indépendantes) Tj
+/F1 10 Tf
+1 0 0 1 54 550 Tm
+(• un agent final de synthèse ancré sur l'état de session) Tj
+/F1 10 Tf
+1 0 0 1 54 536 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 522 Tm
+(En résumé :) Tj
+/F1 10 Tf
+1 0 0 1 54 508 Tm
+() Tj
+/F1 10 Tf
+1 0 0 1 54 494 Tm
+(Quote: L'utilisateur indique le produit qu'il souhaite analyser.) Tj
+/F1 10 Tf
+1 0 0 1 54 480 Tm
+(Quote: Le système déduit le périmètre, les concurrents, les signaux de marché et le) Tj
+/F1 10 Tf
+1 0 0 1 54 466 Tm
+(Quote: rapport final.) Tj
+ET
+endstream
+endobj
+32 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
+endobj
+33 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+endobj
+34 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 5 0 R >>
+endobj
+35 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 6 0 R >>
+endobj
+36 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 7 0 R >>
+endobj
+37 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 8 0 R >>
+endobj
+38 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 9 0 R >>
+endobj
+39 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 10 0 R >>
+endobj
+40 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 11 0 R >>
+endobj
+41 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 12 0 R >>
+endobj
+42 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 13 0 R >>
+endobj
+43 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 14 0 R >>
+endobj
+44 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 15 0 R >>
+endobj
+45 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 16 0 R >>
+endobj
+46 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 17 0 R >>
+endobj
+47 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 18 0 R >>
+endobj
+48 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 19 0 R >>
+endobj
+49 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 20 0 R >>
+endobj
+50 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 21 0 R >>
+endobj
+51 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 22 0 R >>
+endobj
+52 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 23 0 R >>
+endobj
+53 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 24 0 R >>
+endobj
+54 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 25 0 R >>
+endobj
+55 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 26 0 R >>
+endobj
+56 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 27 0 R >>
+endobj
+57 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 28 0 R >>
+endobj
+58 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 29 0 R >>
+endobj
+59 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 30 0 R >>
+endobj
+60 0 obj
+<< /Type /Page /Parent 61 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 31 0 R >>
+endobj
+61 0 obj
+<< /Type /Pages /Count 29 /Kids [32 0 R 33 0 R 34 0 R 35 0 R 36 0 R 37 0 R 38 0 R 39 0 R 40 0 R 41 0 R 42 0 R 43 0 R 44 0 R 45 0 R 46 0 R 47 0 R 48 0 R 49 0 R 50 0 R 51 0 R 52 0 R 53 0 R 54 0 R 55 0 R 56 0 R 57 0 R 58 0 R 59 0 R 60 0 R] >>
+endobj
+62 0 obj
+<< /Type /Catalog /Pages 61 0 R >>
+endobj
+xref
+0 63
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000002967 00000 n 
+0000006183 00000 n 
+0000009672 00000 n 
+0000013577 00000 n 
+0000017282 00000 n 
+0000021657 00000 n 
+0000024185 00000 n 
+0000027328 00000 n 
+0000030326 00000 n 
+0000033249 00000 n 
+0000036321 00000 n 
+0000039332 00000 n 
+0000042838 00000 n 
+0000046329 00000 n 
+0000050856 00000 n 
+0000054755 00000 n 
+0000057609 00000 n 
+0000060119 00000 n 
+0000062485 00000 n 
+0000065619 00000 n 
+0000069652 00000 n 
+0000073629 00000 n 
+0000077181 00000 n 
+0000080662 00000 n 
+0000083550 00000 n 
+0000086910 00000 n 
+0000090395 00000 n 
+0000094137 00000 n 
+0000095592 00000 n 
+0000095730 00000 n 
+0000095868 00000 n 
+0000096006 00000 n 
+0000096144 00000 n 
+0000096282 00000 n 
+0000096420 00000 n 
+0000096558 00000 n 
+0000096697 00000 n 
+0000096836 00000 n 
+0000096975 00000 n 
+0000097114 00000 n 
+0000097253 00000 n 
+0000097392 00000 n 
+0000097531 00000 n 
+0000097670 00000 n 
+0000097809 00000 n 
+0000097948 00000 n 
+0000098087 00000 n 
+0000098226 00000 n 
+0000098365 00000 n 
+0000098504 00000 n 
+0000098643 00000 n 
+0000098782 00000 n 
+0000098921 00000 n 
+0000099060 00000 n 
+0000099199 00000 n 
+0000099338 00000 n 
+0000099477 00000 n 
+0000099616 00000 n 
+0000099872 00000 n 
+trailer
+<< /Size 63 /Root 62 0 R >>
+startxref
+99923
+%%EOF

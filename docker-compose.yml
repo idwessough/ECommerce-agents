@@ -3,7 +3,7 @@ x-app-common: &app-common
     context: .
   image: market-analysis-agent:dev
   environment:
-    GOOGLE_API_KEY: AIzaSyAtfOoB3IPCrlEUcGoElP8RDK03PYCZb-g
+    GOOGLE_API_KEY: GEMINI_API_KEY_HERE
     ADK_MODEL: ${ADK_MODEL:-gemini-3.1-pro-preview}
     DEFAULT_MARKET: ${DEFAULT_MARKET:-CA}
     ANALYSIS_DB_PATH: ${ANALYSIS_DB_PATH:-/app/.adk/analysis_history.db}

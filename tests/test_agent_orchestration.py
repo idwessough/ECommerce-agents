@@ -103,6 +103,16 @@ def test_internal_research_events_are_hidden_but_progress_is_visible(
                     branch="ParallelMarketResearchAgent.TrendSignalsAgent",
                 ),
             ],
+            state_updates={
+                "pricing_intelligence": {
+                    "products": [{"product": "Apple iPhone 11", "pricing_summary": "done"}],
+                },
+                "trend_signals": {
+                    "category": "Smartphone",
+                    "market": "CA",
+                    "trend_summary": "done",
+                },
+            },
         ),
     )
     monkeypatch.setattr(
@@ -133,6 +143,41 @@ def test_internal_research_events_are_hidden_but_progress_is_visible(
     assert "Trend research complete." in visible_messages
     assert "Research complete. Writing the final market analysis..." in visible_messages
     assert "# Final report" in visible_messages
+
+    scope_status_event = next(
+        event
+        for event in events
+        if event.content
+        and event.content.parts
+        and event.content.parts[0].text
+        == "Scope resolved for Apple iPhone 11. Finding competitors..."
+    )
+    assert scope_status_event.actions.state_delta == {"research_scope": research_scope}
+
+    competitor_status_event = next(
+        event
+        for event in events
+        if event.content
+        and event.content.parts
+        and event.content.parts[0].text
+        == "Competitors found. Running pricing, review, sentiment, and trend research in parallel..."
+    )
+    assert competitor_status_event.actions.state_delta == {
+        "competitor_set": {"competitors": ["Galaxy S10"]}
+    }
+
+    pricing_status_event = next(
+        event
+        for event in events
+        if event.content
+        and event.content.parts
+        and event.content.parts[0].text == "Pricing research complete."
+    )
+    assert pricing_status_event.actions.state_delta == {
+        "pricing_intelligence": {
+            "products": [{"product": "Apple iPhone 11", "pricing_summary": "done"}]
+        }
+    }
 
     hidden_internal_events = [
         event for event in events if event.author in {"ResearchScopeAgent", "CompetitorDiscoveryAgent"}

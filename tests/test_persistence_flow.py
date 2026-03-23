@@ -54,6 +54,11 @@ class FakeRuntimeAgent(BaseAgent):
         for event in self.emitted_events:
             yield event
 
+    async def run_async(self, ctx: Any):  # type: ignore[override]
+        """Bypass BaseAgent context cloning so lightweight fake contexts still work."""
+        async for event in self._run_async_impl(ctx):
+            yield event
+
 
 class RecordingStore:
     """Simple in-memory store that records saved snapshots."""

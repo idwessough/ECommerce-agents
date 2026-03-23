@@ -8,7 +8,7 @@ import sqlite3
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -84,6 +84,7 @@ class AnalysisSnapshot(BaseModel):
     )
 
 
+@runtime_checkable
 class AnalysisStore(Protocol):
     """Persistence interface for completed market analyses."""
 

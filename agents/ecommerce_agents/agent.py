@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from collections.abc import Mapping, Sequence
 from typing import Any, AsyncGenerator
 
 from google.adk.agents import BaseAgent, LlmAgent
 from google.adk.agents.parallel_agent import ParallelAgent
-from google.adk.events import Event
+from google.adk.events import Event, EventActions
 from google.adk.tools import google_search
 from google.genai import types
 
@@ -29,6 +30,7 @@ from .storage import (
     AnalysisStore,
     SQLiteAnalysisStore,
     build_analysis_snapshot,
+    make_json_safe,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -38,6 +40,12 @@ _PARALLEL_STAGE_MESSAGES = {
     "ReviewCorpusAgent": "Review-source collection complete.",
     "ReviewSentimentAgent": "Sentiment analysis complete.",
     "TrendSignalsAgent": "Trend research complete.",
+}
+_PARALLEL_STAGE_STATE_KEYS = {
+    "PricingIntelligenceAgent": "pricing_intelligence",
+    "ReviewCorpusAgent": "review_corpus",
+    "ReviewSentimentAgent": "review_sentiment",
+    "TrendSignalsAgent": "trend_signals",
 }
 _PERSISTED_STATE_KEYS = (
     "research_scope",
@@ -271,6 +279,21 @@ def _string_value(value: Any) -> str:
     return value if isinstance(value, str) else str(value)
 
 
+def _normalize_structured_state(value: Any) -> Any:
+    """Return parsed JSON objects when ADK state contains fenced JSON strings."""
+    if isinstance(value, str):
+        candidate = value.strip()
+        if candidate.startswith("```") and candidate.endswith("```"):
+            candidate = candidate[3:-3].strip()
+            if candidate.startswith("json"):
+                candidate = candidate[4:].strip()
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            return value
+    return value
+
+
 class MarketAnalysisOrchestrator(BaseAgent):
     """Custom ADK orchestrator for intake, clarification, discovery, and analysis.
 
@@ -280,11 +303,11 @@ class MarketAnalysisOrchestrator(BaseAgent):
     market research, and the final market analysis agent.
     """
 
-    research_scope_agent: LlmAgent
-    clarification_agent: LlmAgent
-    competitor_discovery_agent: LlmAgent
-    parallel_market_research_agent: ParallelAgent
-    market_analysis_agent: LlmAgent
+    research_scope_agent: BaseAgent
+    clarification_agent: BaseAgent
+    competitor_discovery_agent: BaseAgent
+    parallel_market_research_agent: BaseAgent
+    market_analysis_agent: BaseAgent
     analysis_store: AnalysisStore | None
 
     model_config = {"arbitrary_types_allowed": True}
@@ -293,11 +316,11 @@ class MarketAnalysisOrchestrator(BaseAgent):
         self,
         name: str,
         description: str,
-        research_scope_agent: LlmAgent,
-        clarification_agent: LlmAgent,
-        competitor_discovery_agent: LlmAgent,
-        parallel_market_research_agent: ParallelAgent,
-        market_analysis_agent: LlmAgent,
+        research_scope_agent: BaseAgent,
+        clarification_agent: BaseAgent,
+        competitor_discovery_agent: BaseAgent,
+        parallel_market_research_agent: BaseAgent,
+        market_analysis_agent: BaseAgent,
         analysis_store: AnalysisStore | None = None,
     ) -> None:
         """Initialize the orchestrator and register its top-level sub-agents."""
@@ -319,11 +342,22 @@ class MarketAnalysisOrchestrator(BaseAgent):
             ],
         )
 
-    def _build_status_event(self, ctx: Any, message: str) -> Event:
-        """Return a lightweight user-visible progress event for the current run."""
+    def _build_status_event(
+        self,
+        ctx: Any,
+        message: str,
+        *,
+        state_delta: Mapping[str, Any] | None = None,
+    ) -> Event:
+        """Return a user-visible progress event with optional structured details."""
+        event_actions = EventActions()
+        if state_delta:
+            event_actions.state_delta = make_json_safe(dict(state_delta))
+
         return Event(
             author=self.name,
             invocation_id=getattr(ctx, "invocation_id", ""),
+            actions=event_actions,
             content=types.Content(
                 role="model",
                 parts=[types.Part(text=message)],
@@ -368,14 +402,20 @@ class MarketAnalysisOrchestrator(BaseAgent):
         yield self._build_status_event(
             ctx,
             f"Scope resolved for {scope.canonical_product_name}. Finding competitors...",
+            state_delta={"research_scope": ctx.session.state["research_scope"]},
         )
 
         async for event in self.competitor_discovery_agent.run_async(ctx):
             yield self._hide_content(event)
 
+        ctx.session.state["competitor_set"] = _normalize_structured_state(
+            ctx.session.state.get("competitor_set")
+        )
+
         yield self._build_status_event(
             ctx,
             "Competitors found. Running pricing, review, sentiment, and trend research in parallel...",
+            state_delta={"competitor_set": ctx.session.state.get("competitor_set", {})},
         )
 
         completed_parallel_agents: set[str] = set()
@@ -384,9 +424,16 @@ class MarketAnalysisOrchestrator(BaseAgent):
             if not event.partial and event.author in _PARALLEL_STAGE_MESSAGES:
                 if event.author not in completed_parallel_agents:
                     completed_parallel_agents.add(event.author)
+                    state_key = _PARALLEL_STAGE_STATE_KEYS[event.author]
+                    ctx.session.state[state_key] = _normalize_structured_state(
+                        ctx.session.state.get(state_key)
+                    )
                     yield self._build_status_event(
                         ctx,
                         _PARALLEL_STAGE_MESSAGES[event.author],
+                        state_delta={
+                            state_key: ctx.session.state.get(state_key, {})
+                        },
                     )
 
         yield self._build_status_event(

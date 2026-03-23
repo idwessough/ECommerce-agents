@@ -1,4 +1,4 @@
-"""Basic repository smoke tests."""
+"""Basic repository tests."""
 
 from pathlib import Path
 
