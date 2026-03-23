@@ -1,0 +1,37 @@
+x-app-common: &app-common
+  build:
+    context: .
+  image: market-analysis-agent:dev
+  environment:
+    GOOGLE_API_KEY: GEMINI_API_KEY_HERE
+    ADK_MODEL: ${ADK_MODEL:-gemini-3.1-pro-preview}
+    DEFAULT_MARKET: ${DEFAULT_MARKET:-CA}
+    ANALYSIS_DB_PATH: ${ANALYSIS_DB_PATH:-/app/.adk/analysis_history.db}
+    PYTHONPATH: /app/agents
+  dns:
+    - 1.1.1.1
+    - 8.8.8.8
+  volumes:
+    - .:/app
+
+services:
+  market-analysis-agent:
+    <<: *app-common
+    ports:
+      - "8000:8000"
+    working_dir: /app/agents
+    command: ["adk", "api_server", "--host", "0.0.0.0"]
+
+  market-analysis-web:
+    <<: *app-common
+    profiles: ["web"]
+    ports:
+      - "8001:8000"
+    working_dir: /app/agents
+    command: ["adk", "web", "--host", "0.0.0.0"]
+
+  market-analysis-test:
+    <<: *app-common
+    profiles: ["test"]
+    working_dir: /app
+    command: ["pytest", "-q"]

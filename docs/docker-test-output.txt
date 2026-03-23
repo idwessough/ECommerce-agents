@@ -1,0 +1,7 @@
+time="2026-03-23T02:25:08-04:00" level=warning msg="Found orphan containers ([market-search-agent]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container playground-market-analysis-test-run-1548755e580a Creating 
+ Container playground-market-analysis-test-run-1548755e580a Created 
+.............................                                            [100%]
+29 passed in 11.00s
+EXIT_CODE=0
+

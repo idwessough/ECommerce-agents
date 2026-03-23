@@ -1,0 +1,18 @@
+{
+  "currency": "USD",
+  "msrp_markup": 50.0,
+  "base_prices": [699.99, 649.99, 599.99, 549.99, 499.99],
+  "seller_templates": [
+    {
+      "seller": "Brand Store",
+      "price_offset": 0.0,
+      "availability": "in_stock"
+    },
+    {
+      "seller": "Retailer A",
+      "price_offset": -20.0,
+      "availability": "in_stock"
+    }
+  ],
+  "msrp_source": "official_brand_site"
+}

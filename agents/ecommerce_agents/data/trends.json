@@ -1,0 +1,7 @@
+{
+  "default": {
+    "demand_signal": "stable_growth",
+    "price_pressure": "moderate",
+    "trend_summary_template": "The {category} category shows stable demand with moderate price pressure in {market}."
+  }
+}
