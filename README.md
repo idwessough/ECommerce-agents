@@ -97,8 +97,8 @@ This design aligns well with the ADK documentation:
 
 - custom agents are the right fit when orchestration depends on runtime conditions and session state
 - `ParallelAgent` is the right fit when downstream tasks are independent and benefit from concurrency
-- `google_search` should stay isolated inside agents that use it because of the single-tool limitation
-- the `google_search` tool is only compatible with Gemini 2 models, which is why the default runtime model is `gemini-2.5-flash`
+- this project still keeps `google_search` isolated in specialist agents as a conservative design choice, even though newer ADK Python versions provide more flexibility than the older integration docs describe
+- the current Gemini API docs document Search grounding support on newer Gemini 3 models, so this project now defaults to `gemini-3-flash-preview` for live search-grounded research
 
 ### Recommended orchestration pattern
 
@@ -139,10 +139,10 @@ Those local tools still matter for two reasons:
 | `ClarificationAgent` | `LlmAgent` | Asks one short follow-up question when the request is unclear | user clarification |
 | `CompetitorDiscoveryAgent` | `LlmAgent` with `google_search` | Finds the most relevant competitors for the resolved product | `competitor_set` |
 | `ParallelMarketResearchAgent` | workflow `ParallelAgent` | Runs pricing, review, sentiment, and trend research concurrently | branch outputs in session state |
-| `PricingIntelligenceAgent` | `LlmAgent` with `google_search` | Collects live pricing signals for the main product and competitors | `pricing_intelligence` |
-| `ReviewCorpusAgent` | `LlmAgent` with `google_search` | Collects live review-source evidence for the main product and competitors | `review_corpus` |
-| `ReviewSentimentAgent` | `LlmAgent` with `google_search` | Collects live praise themes, pain points, and sentiment signals | `review_sentiment` |
-| `TrendSignalsAgent` | `LlmAgent` with `google_search` | Collects live demand and category trend signals | `trend_signals` |
+| `PricingIntelligenceAgent` | `LlmAgent` with `google_search` | Search live pricing signals for the main product and competitors | `pricing_intelligence` |
+| `ReviewCorpusAgent` | `LlmAgent` with `google_search` | Search live review-source evidence for the main product and competitors | `review_corpus` |
+| `ReviewSentimentAgent` | `LlmAgent` with `google_search` | Search live praise themes, pain points, and sentiment signals | `review_sentiment` |
+| `TrendSignalsAgent` | `LlmAgent` with `google_search` | Search live demand and category trend signals | `trend_signals` |
 | `MarketAnalysisAgent` | `LlmAgent` | Synthesizes the gathered state into the final Markdown report | final markdown report |
 
 The app name served by ADK is `ecommerce_agents`, and `root_agent` exports the orchestrator.
@@ -463,7 +463,7 @@ Analyze Dyson V15
 - **Language**: Python 3.12
 - **Framework**: Google ADK
 - **App name**: `ecommerce_agents`
-- **Default model**: `gemini-2.5-flash`
+- **Default model**: `gemini-3-flash-preview`
 - **Runtime surfaces**: ADK API Server and ADK Web UI
 - **Local startup target**: Docker Compose on macOS and Windows
 
@@ -485,13 +485,13 @@ Typical local values:
 
 ```text
 GOOGLE_API_KEY=your-google-api-key
-ADK_MODEL=gemini-2.5-flash
+ADK_MODEL=gemini-3-flash-preview
 DEFAULT_MARKET=US
 ```
 
 ### 2. Model selection
 
-The project defaults to `gemini-2.5-flash` because the live runtime depends on `google_search`, and the ADK Google Search integration is limited to Gemini 2 models.
+The project now defaults to `gemini-3-flash-preview`. The current Gemini API model docs explicitly show Search grounding support for this model, even though the ADK `google_search` integration page still contains older Gemini 2 wording. This repository follows the newer Gemini API model documentation for model compatibility.
 
 ### 3. Optional preflight check
 
@@ -647,16 +647,4 @@ In short:
 
 > The user says what product they want to analyze.  
 > The system figures out the scope, competitors, live signals, and final report.
-
-## References
-
-- [ADK technical overview](https://google.github.io/adk-docs/get-started/about/index.md)
-- [ADK custom agents](https://google.github.io/adk-docs/agents/custom-agents/index.md)
-- [ADK multi-agent systems](https://google.github.io/adk-docs/agents/multi-agents/index.md)
-- [ADK parallel agents](https://google.github.io/adk-docs/agents/workflow-agents/parallel-agents/index.md)
-- [ADK Google Search tool](https://google.github.io/adk-docs/integrations/google-search/index.md)
-- [ADK Google Search grounding](https://google.github.io/adk-docs/grounding/google_search_grounding/index.md)
-- [ADK API server](https://google.github.io/adk-docs/runtime/api-server/index.md)
-- [ADK web interface](https://google.github.io/adk-docs/runtime/web-interface/index.md)
-- [ADK session state](https://google.github.io/adk-docs/sessions/state/index.md)
-- [ADK tool performance and parallelism](https://google.github.io/adk-docs/tools-custom/performance/index.md)
+ 
