@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>README.en</title>
+<style>
+  @page { margin: 16mm 14mm 18mm; }
+  :root { --fg:#18212b; --muted:#526170; --line:#d8e0e8; --bg:#ffffff; --code:#f5f7fa; }
+  html, body { background: var(--bg); color: var(--fg); margin:0; padding:0; }
+  body { font-family: Georgia, "Times New Roman", serif; line-height: 1.55; }
+  main { max-width: 920px; margin: 0 auto; padding: 0; }
+  h1, h2, h3 { font-family: Helvetica, Arial, sans-serif; line-height: 1.2; margin-top: 1.6em; color: #0f1720; }
+  h1 { font-size: 2.1rem; margin-top: 0; border-bottom: 2px solid var(--line); padding-bottom: 10px; }
+  h2 { font-size: 1.4rem; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  h3 { font-size: 1.1rem; }
+  p, li { font-size: 0.98rem; }
+  code { font-family: "Courier New", monospace; background: var(--code); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--code); border: 1px solid var(--line); border-radius: 8px; padding: 14px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  pre code { background: transparent; padding: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.4rem; font-size: 0.95rem; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; text-align: left; }
+  th { background: #eef3f8; font-family: Helvetica, Arial, sans-serif; }
+  blockquote { margin: 1rem 0; padding: 0.2rem 1rem; border-left: 4px solid #9db1c4; color: var(--muted); background: #f7fafc; }
+  a { color: #0f5ea8; text-decoration: none; }
+  ul, ol { padding-left: 1.45rem; }
+  .mermaid-figure { margin: 1.2rem 0 1.5rem; page-break-inside: avoid; }
+  .diagram-svg { display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  @media print {
+    pre, table, blockquote, .mermaid-figure { break-inside: avoid; }
+    svg { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<main>
+<h1>ECommerce Agents</h1>
+<h2>Architecture-First README</h2>
+<p>This repository contains a Google ADK application exposed as <code>ecommerce_agents</code>. Its job is to turn a simple product request into a structured market-analysis report for an e-commerce team.</p>
+<p>This README is intentionally self-contained for evaluation. It includes the architecture rationale, installation and usage steps, API examples, testing strategy, a representative generated report, and the written answers to the theoretical design questions from the assignment.</p>
+<p>Example input:</p>
+<pre><code class="language-json">{
+  &quot;product&quot;: &quot;Dyson V15&quot;,
+  &quot;market&quot;: &quot;CA&quot;
+}</code></pre>
+<p>or simply:</p>
+<pre><code class="language-text">Analyze Dyson V15</code></pre>
+<p>The active runtime flow is:</p>
+<pre><code class="language-text">MarketAnalysisOrchestrator
+  -&gt; ResearchScopeAgent
+  -&gt; ClarificationAgent (only if needed)
+  -&gt; CompetitorDiscoveryAgent
+  -&gt; ParallelMarketResearchAgent
+  -&gt; MarketAnalysisAgent</code></pre>
+<p>The system should automatically:</p>
+<ul>
+<li>normalize the product name</li>
+<li>infer the brand, category, and target market</li>
+<li>discover the most relevant competitors</li>
+<li>gather live pricing, review, sentiment, and trend signals</li>
+<li>synthesize one final market report</li>
+</ul>
+<p>The user should not have to explain how competitor discovery works or how the research should be run. The system should ask a follow-up question only when the product request is genuinely ambiguous.</p>
+<h2>Quick Start</h2>
+<p>To run the app without hunting through the repository:</p>
+<ol>
+<li>Open <code>docker-compose.yml</code>.</li>
+<li>Go to the shared <code>x-app-common.environment</code> section.</li>
+<li>Replace:</li>
+</ol>
+<pre><code class="language-text">GOOGLE_API_KEY: GEMINI_API_KEY_HERE</code></pre>
+<p>with a valid Gemini API key.</p>
+<p>Important: this line is declared only once under <code>x-app-common</code>, so it is shared by the web UI, the API container, and the test runner. Reviewers do not need to edit any other file to make the app start.</p>
+<p>Then run:</p>
+<pre><code class="language-bash">docker compose --profile web up --build market-analysis-web</code></pre>
+<p>Then open:</p>
+<pre><code class="language-text">http://localhost:8001</code></pre>
+<p>If the API key is changed after the first run, recreate the container so the new environment value is loaded:</p>
+<pre><code class="language-bash">docker compose --profile web up -d --build --force-recreate market-analysis-web</code></pre>
+<h2>Product Goal</h2>
+<p>The goal is to build a market-intelligence assistant for e-commerce teams. Given a product name, the system should produce a useful business report covering:</p>
+<ul>
+<li>product positioning</li>
+<li>likely competitors</li>
+<li>pricing and offer signals</li>
+<li>customer sentiment</li>
+<li>market trends</li>
+<li>actionable recommendations</li>
+</ul>
+<p>This architecture prioritizes:</p>
+<ul>
+<li>a simple user experience</li>
+<li>predictable orchestration</li>
+<li>explicit state handoffs between stages</li>
+<li>easy testing and inspection</li>
+<li>extensibility for future API-backed collectors</li>
+</ul>
+<h2>User Experience</h2>
+<p>The intended user flow is minimal:</p>
+<ol>
+<li>The user submits a product name.</li>
+<li>The system resolves the exact product and market context.</li>
+<li>The system asks one short clarification question only if the request is unclear.</li>
+<li>The system discovers competitors automatically.</li>
+<li>The system runs live market research.</li>
+<li>The user receives one final report.</li>
+</ol>
+<p>Examples:</p>
+<ul>
+<li><code>Analyze Dyson V15</code> -&gt; likely no clarification required</li>
+<li><code>Analyze AirPods</code> -&gt; clarification may be required because multiple models exist</li>
+<li><code>Hello</code> -&gt; the system should ask which product the user wants analyzed</li>
+</ul>
+<h2>Recommended Architecture</h2>
+<h3>Decision</h3>
+<p>The current recommended solution is a small ADK multi-agent system with explicit branching and a parallel live-research stage.</p>
+<h3>Why this architecture</h3>
+<p>The current implementation follows the ADK patterns that fit the problem best:</p>
+<ul>
+<li>a custom <code>BaseAgent</code> orchestrator for conditional control flow</li>
+<li>a search-capable <code>ResearchScopeAgent</code> to resolve the request into structured state</li>
+<li>a dedicated <code>ClarificationAgent</code> for one short follow-up question when the scope is unclear</li>
+<li>a search-capable <code>CompetitorDiscoveryAgent</code> that derives its own queries from the resolved scope</li>
+<li>a workflow <code>ParallelAgent</code> that runs independent research branches concurrently</li>
+<li>a final synthesis agent that writes the user-facing report from session state</li>
+</ul>
+<p>Aligns well with the ADK documentation:</p>
+<ul>
+<li>custom agents are the right fit when orchestration depends on runtime conditions and session state</li>
+<li><code>ParallelAgent</code> is the right fit when downstream tasks are independent and benefit from concurrency</li>
+<li>this project still keeps <code>google_search</code> isolated in specialist agents as a conservative design choice, even though newer ADK Python versions provide more flexibility than the older integration docs describe</li>
+<li>the current Gemini API docs document Search grounding support on Gemini 3.1 Pro Preview, so this project now defaults to <code>gemini-3.1-pro-preview</code> for live search-grounded research</li>
+</ul>
+<h3>Why Google ADK instead of a simpler approach</h3>
+<p>Choosing Google ADK here is deliberate. The problem is not just to send one prompt to a model and return text. The application needs conditional clarification, structured shared state, automatic competitor discovery, parallel research branches, and the ability to expose the same workflow through both a web UI and an API.</p>
+<p>Compared with a more hand-rolled Python orchestration layer or a lighter single-agent setup, ADK removes a large amount of glue code around:</p>
+<ul>
+<li>routing between agents</li>
+<li>shared session state</li>
+<li>event streaming</li>
+<li>parallel execution</li>
+<li>exposing the workflow through standard runtime surfaces such as ADK Web and ADK API Server</li>
+</ul>
+<p>This is also the more scalable architectural choice for the future of the project. If the app evolves, it will be easier:</p>
+<ul>
+<li>to add a new specialist agent without rewriting the whole pipeline</li>
+<li>to replace one research branch with a dedicated tool or API-backed collector</li>
+<li>to introduce caching, job queues, or async execution later</li>
+<li>to preserve a clean separation between orchestration, data collection, and final synthesis</li>
+<li>to observe behavior at the session, event, and agent-output level</li>
+</ul>
+<p>In other words, ADK gives the project better functional scalability: the workflow can grow in complexity without turning into a fragile chain of manual conditions and model calls. Production scalability will still require the usual supporting layers such as stronger persistence, caching, monitoring, and possibly async processing, but ADK already provides a cleaner and more extensible orchestration foundation than more minimal alternatives.</p>
+<h3>Recommended orchestration pattern</h3>
+<pre><code class="language-text">MarketAnalysisOrchestrator(
+  ResearchScope
+  -&gt; Clarification if needed
+  -&gt; Competitor Discovery
+  -&gt; Parallel Market Research
+  -&gt; Final Analysis
+)</code></pre>
+<h2>Specialized Tool Layer</h2>
+<p>This submission implements four specialized tools as modular business components:</p>
+<ul>
+<li>pricing_intelligence</li>
+<li>review_corpus</li>
+<li>review_sentiment</li>
+<li>trend_signals</li>
+</ul>
+<p>These tools are independently testable and define the structured market-analysis capabilities of the system. The current live ADK runtime is agent-orchestrated: specialist agents use search-grounded research to gather evidence and write structured outputs into session state, while the tool layer provides a stable, deterministic abstraction for testing, validation, and future provider-backed integrations.</p>
+<p>This is intentional. Agents are responsible for orchestration and end-to-end workflow control, while tools represent the reusable specialized analysis capabilities required by the assignment.</p>
+<p>In other words, the architecture separates orchestration from capability implementation: agents coordinate the workflow, and tools define the specialized functions.</p>
+<p>The active ADK runtime is currently agent-first. In the live execution path, the specialist agents use <code>google_search</code> to gather grounded evidence, while the tool layer remains available as the modular capability layer for testing, deterministic validation, and future integration with structured e-commerce data sources.</p>
+<p>The repository still contains local Python functions in <code>agents/ecommerce_agents/tools.py</code> and fixture-backed providers in <code>agents/ecommerce_agents/providers/mock.py</code>, but those are no longer the primary execution path of the ADK app. The running workflow now uses search-capable specialist agents to gather live evidence and stores their outputs directly in session state.</p>
+<p>Those local tools still matter for two reasons:</p>
+<ul>
+<li>they provide deterministic structures for unit tests and local fixture-based validation</li>
+<li>they offer a clean staging point if the project later adds API-backed collectors behind Python function tools</li>
+</ul>
+<h3>Alternatives considered</h3>
+<ul>
+<li><strong>Single agent</strong>: simpler on paper, but weaker control over clarification, scoping, and grounded competitor discovery.</li>
+<li><strong>Only workflow agents</strong>: not enough because the application needs explicit branching based on <code>research_scope</code> and clarification rules.</li>
+<li><strong>Many more specialist agents</strong>: possible, but unnecessary beyond the current live-research split.</li>
+<li><strong>Function-tool-only research</strong>: useful for deterministic integrations later, but not the current runtime architecture.</li>
+</ul>
+<h2>Deliverable Coverage</h2>
+<p>The assignment asks for implementation of steps 1 to 3 in code and for written answers to steps 4 to 7 in the README. The current repository is structured that way:</p>
+<table>
+<thead><tr><th>Requirement</th><th>Current solution</th></tr></thead>
+<tbody>
+<tr><td>Framework or native orchestration</td><td>Google ADK with a custom <code>BaseAgent</code> orchestrator</td></tr>
+<tr><td>Main orchestrator</td><td><code>MarketAnalysisOrchestrator</code></td></tr>
+<tr><td>Modular tools</td><td><code>pricing_intelligence</code>, <code>review_corpus</code>, <code>review_sentiment</code>, <code>trend_signals</code></td></tr>
+<tr><td>REST API</td><td>ADK API server on <code>http://localhost:8000</code></td></tr>
+<tr><td>Containerization</td><td><code>Dockerfile</code> and <code>docker-compose.yml</code></td></tr>
+<tr><td>Tests</td><td>Unit tests for tools, routing, orchestration, storage, and error handling</td></tr>
+<tr><td>Example report</td><td>Included later in this README</td></tr>
+<tr><td>Theory answers for steps 4 to 7</td><td>Included later in this README</td></tr>
+</tbody>
+</table>
+<p>The code intentionally focuses on steps 1 to 3 of the assignment. The sections later in this README for steps 4 to 7 are design recommendations and production architecture guidance, not claims that those capabilities are already fully implemented in the current codebase.</p>
+<h2>High-Level Components</h2>
+<table>
+<thead><tr><th>Component</th><th>ADK Type</th><th>Responsibility</th><th>Main Output</th></tr></thead>
+<tbody>
+<tr><td><code>MarketAnalysisOrchestrator</code></td><td>custom <code>BaseAgent</code></td><td>Coordinates scope resolution, clarification, competitor discovery, parallel research, and final synthesis</td><td>final report</td></tr>
+<tr><td><code>ResearchScopeAgent</code></td><td><code>LlmAgent</code> with <code>google_search</code></td><td>Resolves the user request into a structured scope and flags clarification when needed</td><td><code>research_scope</code></td></tr>
+<tr><td><code>ClarificationAgent</code></td><td><code>LlmAgent</code></td><td>Asks one short follow-up question when the request is unclear</td><td>user clarification</td></tr>
+<tr><td><code>CompetitorDiscoveryAgent</code></td><td><code>LlmAgent</code> with <code>google_search</code></td><td>Finds the most relevant competitors for the resolved product</td><td><code>competitor_set</code></td></tr>
+<tr><td><code>ParallelMarketResearchAgent</code></td><td>workflow <code>ParallelAgent</code></td><td>Runs pricing, review, sentiment, and trend research concurrently</td><td>branch outputs in session state</td></tr>
+<tr><td><code>PricingIntelligenceAgent</code></td><td><code>LlmAgent</code> with <code>google_search</code></td><td>Search live pricing signals for the main product and competitors</td><td><code>pricing_intelligence</code></td></tr>
+<tr><td><code>ReviewCorpusAgent</code></td><td><code>LlmAgent</code> with <code>google_search</code></td><td>Search live review-source evidence for the main product and competitors</td><td><code>review_corpus</code></td></tr>
+<tr><td><code>ReviewSentimentAgent</code></td><td><code>LlmAgent</code> with <code>google_search</code></td><td>Search live praise themes, pain points, and sentiment signals</td><td><code>review_sentiment</code></td></tr>
+<tr><td><code>TrendSignalsAgent</code></td><td><code>LlmAgent</code> with <code>google_search</code></td><td>Search live demand and category trend signals</td><td><code>trend_signals</code></td></tr>
+<tr><td><code>MarketAnalysisAgent</code></td><td><code>LlmAgent</code></td><td>Synthesizes the gathered state into the final Markdown report</td><td>final markdown report</td></tr>
+</tbody>
+</table>
+<p>The app name served by ADK is <code>ecommerce_agents</code>, and <code>root_agent</code> exports the orchestrator.</p>
+<h2>Session State Contracts</h2>
+<p>The system relies on explicit state handoffs between stages. The most important session-state keys are:</p>
+<table>
+<thead><tr><th>State Key</th><th>Produced By</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>research_scope</code></td><td><code>ResearchScopeAgent</code></td><td>Normalized product scope used for routing and downstream prompts</td></tr>
+<tr><td><code>competitor_set</code></td><td><code>CompetitorDiscoveryAgent</code></td><td>Structured competitor list used by all research branches</td></tr>
+<tr><td><code>pricing_intelligence</code></td><td><code>PricingIntelligenceAgent</code></td><td>Live pricing evidence for the product and competitors</td></tr>
+<tr><td><code>review_corpus</code></td><td><code>ReviewCorpusAgent</code></td><td>Review-source evidence and rating/volume signals</td></tr>
+<tr><td><code>review_sentiment</code></td><td><code>ReviewSentimentAgent</code></td><td>Praise themes, pain points, and sentiment summary</td></tr>
+<tr><td><code>trend_signals</code></td><td><code>TrendSignalsAgent</code></td><td>Category demand and market-trend signals</td></tr>
+<tr><td><code>final_report</code></td><td><code>MarketAnalysisAgent</code></td><td>Final Markdown report used for durable persistence and user output</td></tr>
+</tbody>
+</table>
+<p>Completed analyses are also saved to a lightweight SQLite store after the full analysis path succeeds. Clarification-only runs are not persisted. The durable record keeps request metadata, the final Markdown report, a JSON snapshot of the main session-state outputs, and any source URLs that can be extracted from that snapshot.</p>
+<p>Representative state shapes:</p>
+<h3>Example <code>research_scope</code></h3>
+<pre><code class="language-json">{
+  &quot;canonical_product_name&quot;: &quot;Dyson V15 Detect&quot;,
+  &quot;brand&quot;: &quot;Dyson&quot;,
+  &quot;category&quot;: &quot;cordless stick vacuum&quot;,
+  &quot;market&quot;: &quot;CA&quot;,
+  &quot;requires_clarification&quot;: false,
+  &quot;resolution_confidence&quot;: 0.93
+}</code></pre>
+<h3>Example <code>competitor_set</code></h3>
+<pre><code class="language-json">{
+  &quot;primary_product&quot;: &quot;Dyson V15 Detect&quot;,
+  &quot;competitors&quot;: [
+    {
+      &quot;brand&quot;: &quot;Shark&quot;,
+      &quot;model&quot;: &quot;Detect Pro&quot;,
+      &quot;confidence&quot;: 0.91
+    },
+    {
+      &quot;brand&quot;: &quot;Tineco&quot;,
+      &quot;model&quot;: &quot;Pure One S15&quot;,
+      &quot;confidence&quot;: 0.88
+    },
+    {
+      &quot;brand&quot;: &quot;Samsung&quot;,
+      &quot;model&quot;: &quot;Bespoke Jet&quot;,
+      &quot;confidence&quot;: 0.82
+    }
+  ]
+}</code></pre>
+<h3>Example <code>pricing_intelligence</code></h3>
+<pre><code class="language-json">{
+  &quot;currency&quot;: &quot;USD&quot;,
+  &quot;primary_product&quot;: &quot;Dyson V15 Detect&quot;,
+  &quot;products&quot;: [
+    {
+      &quot;product&quot;: &quot;Dyson V15 Detect&quot;,
+      &quot;msrp_when_found&quot;: {
+        &quot;amount&quot;: 749.99,
+        &quot;source&quot;: &quot;official Dyson listing&quot;
+      },
+      &quot;representative_prices&quot;: [
+        {
+          &quot;seller&quot;: &quot;Dyson&quot;,
+          &quot;price&quot;: 699.99,
+          &quot;availability&quot;: &quot;in stock&quot;
+        },
+        {
+          &quot;seller&quot;: &quot;Best Buy&quot;,
+          &quot;price&quot;: 679.99,
+          &quot;availability&quot;: &quot;in stock&quot;
+        }
+      ],
+      &quot;pricing_summary&quot;: &quot;Observed offers cluster below MSRP across major retailers.&quot;,
+      &quot;source_notes&quot;: [
+        &quot;Official brand listing used to anchor MSRP.&quot;,
+        &quot;Retailer listings used for current sale pricing.&quot;
+      ],
+      &quot;freshness_note&quot;: &quot;Signals were gathered from live web research during the run.&quot;
+    }
+  ]
+}</code></pre>
+<h2>Architecture Schema</h2>
+<figure class="mermaid-figure">
+  <svg class="diagram-svg" viewBox="0 0 1180 980" role="img" aria-label="Architecture schema">
+    <defs>
+      <marker id="arrow-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6f85"></path>
+      </marker>
+      <style>
+        .node { fill:#f7fafc; stroke:#8aa0b6; stroke-width:2; }
+        .node-strong { fill:#eaf2fb; stroke:#567da6; stroke-width:2.2; }
+        .decision { fill:#fff9e8; stroke:#b78b22; stroke-width:2; }
+        .chip { fill:#ffffff; stroke:#8aa0b6; stroke-width:1.7; }
+        .label { fill:#16202a; font-family: Helvetica, Arial, sans-serif; font-size:18px; font-weight:700; text-anchor:middle; }
+        .sub { fill:#44576a; font-family: Helvetica, Arial, sans-serif; font-size:15px; text-anchor:middle; }
+        .small { fill:#44576a; font-family: Helvetica, Arial, sans-serif; font-size:14px; text-anchor:middle; }
+        .flow { fill:none; stroke:#5a6f85; stroke-width:3; marker-end:url(#arrow-en); }
+      </style>
+    </defs>
+
+    <rect class="node-strong" x="410" y="24" width="360" height="58" rx="12"></rect>
+    <text class="label" x="590" y="49">User</text>
+    <text class="sub" x="590" y="69">Analyze Dyson V15</text>
+
+    <rect class="node" x="410" y="116" width="360" height="66" rx="12"></rect>
+    <text class="label" x="590" y="143">API Layer</text>
+    <text class="sub" x="590" y="163">ADK API Server or ADK Web</text>
+
+    <rect class="node-strong" x="410" y="216" width="360" height="70" rx="12"></rect>
+    <text class="label" x="590" y="245">MarketAnalysisOrchestrator</text>
+    <text class="sub" x="590" y="266">Custom ADK BaseAgent</text>
+
+    <rect class="node" x="410" y="322" width="360" height="90" rx="12"></rect>
+    <text class="label" x="590" y="350">ResearchScopeAgent</text>
+    <text class="sub" x="590" y="372">Resolve product, category, and market</text>
+    <text class="sub" x="590" y="391">Use search when helpful</text>
+
+    <polygon class="decision" points="590,450 690,520 590,590 490,520"></polygon>
+    <text class="label" x="590" y="515">Clarification</text>
+    <text class="sub" x="590" y="537">needed?</text>
+
+    <rect class="node" x="36" y="648" width="320" height="82" rx="12"></rect>
+    <text class="label" x="196" y="678">ClarificationAgent</text>
+    <text class="sub" x="196" y="699">Ask one short follow-up question</text>
+
+    <rect class="node" x="430" y="648" width="320" height="82" rx="12"></rect>
+    <text class="label" x="590" y="678">CompetitorDiscoveryAgent</text>
+    <text class="sub" x="590" y="699">Search competitors and build competitor set</text>
+
+    <rect class="node-strong" x="430" y="770" width="430" height="112" rx="14"></rect>
+    <text class="label" x="645" y="800">ParallelMarketResearchAgent</text>
+    <text class="sub" x="645" y="822">Run pricing, review, sentiment, and trend research in parallel</text>
+    <rect class="chip" x="454" y="840" width="180" height="28" rx="14"></rect>
+    <rect class="chip" x="646" y="840" width="180" height="28" rx="14"></rect>
+    <rect class="chip" x="454" y="876" width="180" height="28" rx="14"></rect>
+    <rect class="chip" x="646" y="876" width="180" height="28" rx="14"></rect>
+    <text class="small" x="544" y="859">PricingIntelligenceAgent</text>
+    <text class="small" x="736" y="859">ReviewCorpusAgent</text>
+    <text class="small" x="544" y="895">ReviewSentimentAgent</text>
+    <text class="small" x="736" y="895">TrendSignalsAgent</text>
+
+    <rect class="node" x="860" y="438" width="270" height="110" rx="12"></rect>
+    <text class="label" x="995" y="472">Shared ADK Session State</text>
+    <text class="sub" x="995" y="495">research_scope</text>
+    <text class="sub" x="995" y="515">competitor_set and market signals</text>
+
+    <rect class="node-strong" x="860" y="650" width="270" height="88" rx="12"></rect>
+    <text class="label" x="995" y="680">MarketAnalysisAgent</text>
+    <text class="sub" x="995" y="702">Synthesize grounded report</text>
+
+    <rect class="node-strong" x="860" y="790" width="270" height="72" rx="12"></rect>
+    <text class="label" x="995" y="819">Final Output</text>
+    <text class="sub" x="995" y="841">Business-ready market analysis</text>
+
+    <path class="flow" d="M590 82 L590 116"></path>
+    <path class="flow" d="M590 182 L590 216"></path>
+    <path class="flow" d="M590 286 L590 322"></path>
+    <path class="flow" d="M590 412 L590 450"></path>
+    <path class="flow" d="M490 520 L196 520 L196 648"></path>
+    <path class="flow" d="M590 590 L590 648"></path>
+    <path class="flow" d="M590 730 L590 770"></path>
+    <path class="flow" d="M770 356 L820 356 L820 470 L860 470"></path>
+    <path class="flow" d="M750 689 L820 689 L820 505 L860 505"></path>
+    <path class="flow" d="M860 826 L830 826 L830 525 L860 525"></path>
+    <path class="flow" d="M995 548 L995 650"></path>
+    <path class="flow" d="M995 738 L995 790"></path>
+
+    <text class="small" x="286" y="509">yes</text>
+    <text class="small" x="620" y="621">no</text>
+  </svg>
+</figure>
+<h2>Orchestrator Model</h2>
+<figure class="mermaid-figure">
+  <svg class="diagram-svg" viewBox="0 0 1240 870" role="img" aria-label="Orchestrator model">
+    <defs>
+      <marker id="arrow-seq-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6f85"></path>
+      </marker>
+      <marker id="arrow-dash-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8b5"></path>
+      </marker>
+      <style>
+        .head { fill:#eef4fb; stroke:#8aa0b6; stroke-width:2; }
+        .head-text { fill:#16202a; font-family: Helvetica, Arial, sans-serif; font-size:16px; font-weight:700; text-anchor:middle; }
+        .life { stroke:#b8c5d1; stroke-width:2; stroke-dasharray:8 7; }
+        .msg { fill:none; stroke:#5a6f85; stroke-width:2.7; marker-end:url(#arrow-seq-en); }
+        .reply { fill:none; stroke:#9aa8b5; stroke-width:2.4; stroke-dasharray:8 6; marker-end:url(#arrow-dash-en); }
+        .band { fill:#f8fbfe; stroke:#d7e1ea; stroke-width:1.5; }
+        .band-title { fill:#44576a; font-family: Helvetica, Arial, sans-serif; font-size:15px; font-weight:700; }
+        .label { fill:#22313f; font-family: Helvetica, Arial, sans-serif; font-size:14px; }
+      </style>
+    </defs>
+
+    <rect class="head" x="40" y="24" width="120" height="42" rx="10"></rect>
+    <rect class="head" x="190" y="24" width="120" height="42" rx="10"></rect>
+    <rect class="head" x="340" y="24" width="150" height="42" rx="10"></rect>
+    <rect class="head" x="520" y="24" width="130" height="42" rx="10"></rect>
+    <rect class="head" x="690" y="24" width="130" height="42" rx="10"></rect>
+    <rect class="head" x="860" y="24" width="150" height="42" rx="10"></rect>
+    <rect class="head" x="1040" y="24" width="150" height="42" rx="10"></rect>
+
+    <text class="head-text" x="100" y="50">User</text>
+    <text class="head-text" x="250" y="50">ADK Runtime</text>
+    <text class="head-text" x="415" y="50">Orchestrator</text>
+    <text class="head-text" x="585" y="50">ResearchScope</text>
+    <text class="head-text" x="755" y="50">Clarification</text>
+    <text class="head-text" x="935" y="50">CompetitorDiscovery</text>
+    <text class="head-text" x="1115" y="50">Parallel and Final</text>
+
+    <line class="life" x1="100" y1="66" x2="100" y2="820"></line>
+    <line class="life" x1="250" y1="66" x2="250" y2="820"></line>
+    <line class="life" x1="415" y1="66" x2="415" y2="820"></line>
+    <line class="life" x1="585" y1="66" x2="585" y2="820"></line>
+    <line class="life" x1="755" y1="66" x2="755" y2="820"></line>
+    <line class="life" x1="935" y1="66" x2="935" y2="820"></line>
+    <line class="life" x1="1115" y1="66" x2="1115" y2="820"></line>
+
+    <path class="msg" d="M100 110 L250 110"></path>
+    <text class="label" x="126" y="102">Analyze Dyson V15</text>
+
+    <path class="msg" d="M250 160 L415 160"></path>
+    <text class="label" x="286" y="152">Start analysis</text>
+
+    <path class="msg" d="M415 220 L585 220"></path>
+    <text class="label" x="444" y="212">Resolve request into research_scope</text>
+
+    <path class="reply" d="M585 270 L415 270"></path>
+    <text class="label" x="448" y="262">research_scope</text>
+
+    <rect class="band" x="360" y="320" width="450" height="160" rx="12"></rect>
+    <text class="band-title" x="382" y="348">Alt: clarification needed</text>
+    <path class="msg" d="M415 392 L755 392"></path>
+    <text class="label" x="474" y="384">Ask one follow-up question</text>
+    <path class="reply" d="M755 438 L250 438"></path>
+    <text class="label" x="478" y="430">clarification prompt</text>
+
+    <rect class="band" x="360" y="520" width="810" height="230" rx="12"></rect>
+    <text class="band-title" x="382" y="548">Else: product is clear</text>
+    <path class="msg" d="M415 592 L935 592"></path>
+    <text class="label" x="514" y="584">Discover competitors automatically</text>
+    <path class="reply" d="M935 638 L415 638"></path>
+    <text class="label" x="590" y="630">competitor_set</text>
+
+    <path class="msg" d="M415 682 L1115 682"></path>
+    <text class="label" x="626" y="674">Run parallel market research and synthesis</text>
+
+    <path class="reply" d="M1115 728 L250 728"></path>
+    <text class="label" x="612" y="720">pricing, reviews, sentiment, trends, final report</text>
+
+    <path class="reply" d="M250 792 L100 792"></path>
+    <text class="label" x="118" y="784">Final response</text>
+  </svg>
+</figure>
+<h2>Agent Behavior</h2>
+<h3>1. ResearchScopeAgent</h3>
+<p><strong>Role</strong></p>
+<p>Transforms a simple user request into a structured research scope.</p>
+<p><strong>What it does</strong></p>
+<ul>
+<li>resolves the canonical product name</li>
+<li>infers the brand, category, and market</li>
+<li>uses <code>google_search</code> when it helps confirm the product or detect ambiguity</li>
+<li>sets <code>requires_clarification</code> and <code>resolution_confidence</code></li>
+<li>does not identify competitors</li>
+</ul>
+<h3>2. ClarificationAgent</h3>
+<p><strong>Role</strong></p>
+<p>Asks one short, concrete follow-up question when the request is ambiguous.</p>
+<p><strong>What it does</strong></p>
+<ul>
+<li>reads <code>research_scope</code> from session state</li>
+<li>asks for the missing detail needed to continue</li>
+<li>does not run search</li>
+<li>does not generate a market report</li>
+</ul>
+<p>This separation keeps clarification conversational and predictable instead of hiding it behind a tool.</p>
+<h3>3. CompetitorDiscoveryAgent</h3>
+<p><strong>Role</strong></p>
+<p>Finds the most relevant competitors for the resolved product.</p>
+<p><strong>How it works</strong></p>
+<p>It derives its own search queries from <code>research_scope</code>. For <code>Dyson V15 Detect</code>, those queries may resemble:</p>
+<ul>
+<li><code>Dyson V15 Detect competitors</code></li>
+<li><code>best premium cordless stick vacuums</code></li>
+<li><code>alternatives to Dyson V15 Detect</code></li>
+<li><code>Dyson V15 vs Shark Detect Pro</code></li>
+<li><code>Dyson V15 vs Tineco Pure One S15</code></li>
+</ul>
+<p>It then ranks candidates using:</p>
+<ul>
+<li>category similarity</li>
+<li>price-band proximity</li>
+<li>use-case similarity</li>
+<li>repetition across sources</li>
+</ul>
+<h3>4. ParallelMarketResearchAgent</h3>
+<p><strong>Role</strong></p>
+<p>Runs four live research branches concurrently once the product scope and competitor set are stable.</p>
+<p><strong>Why this stage exists</strong></p>
+<p>According to the ADK <code>ParallelAgent</code> model, parallel branches are most useful when the work is independent. That matches this stage well because pricing, review evidence, sentiment signals, and trend signals can all be gathered separately after competitor discovery.</p>
+<p><strong>Important ADK behavior</strong></p>
+<p>Parallel sub-agents do not automatically share branch-to-branch history during execution. Each branch writes its own output back to session state, and the final synthesis agent reconciles those results afterward.</p>
+<p><strong>Outputs written to state</strong></p>
+<ul>
+<li><code>pricing_intelligence</code></li>
+<li><code>review_corpus</code></li>
+<li><code>review_sentiment</code></li>
+<li><code>trend_signals</code></li>
+</ul>
+<h3>5. MarketAnalysisAgent</h3>
+<p><strong>Role</strong></p>
+<p>Synthesizes <code>research_scope</code>, <code>competitor_set</code>, <code>pricing_intelligence</code>, <code>review_corpus</code>, <code>review_sentiment</code>, and <code>trend_signals</code> into the final Markdown report.</p>
+<p><strong>Why synthesis stays separate</strong></p>
+<p>This keeps the report grounded in already-collected evidence and avoids mixing live search behavior into the final reporting step.</p>
+<h2>Live Research Strategy</h2>
+<p>The current runtime uses four specialist research branches after competitor discovery.</p>
+<h3>Pricing branch</h3>
+<p><code>PricingIntelligenceAgent</code> gathers live pricing signals for the primary product and competitors.</p>
+<p>It prioritizes:</p>
+<ul>
+<li>official brand pages for MSRP or list-price signals</li>
+<li>major retailers for current observed prices</li>
+<li>freshness notes and source context for downstream synthesis</li>
+</ul>
+<h3>Review-evidence branch</h3>
+<p><code>ReviewCorpusAgent</code> gathers review-source evidence for the primary product and competitors.</p>
+<p>It focuses on:</p>
+<ul>
+<li>review sources worth trusting</li>
+<li>rating and review-volume signals</li>
+<li>concise highlights rather than long quoted passages</li>
+</ul>
+<h3>Sentiment branch</h3>
+<p><code>ReviewSentimentAgent</code> gathers customer praise themes, pain points, and overall sentiment signals.</p>
+<p>This branch is intentionally separate from <code>ReviewCorpusAgent</code>. In the current runtime, sentiment is gathered as its own live-search evidence stream rather than being computed from a single normalized review corpus.</p>
+<h3>Trend branch</h3>
+<p><code>TrendSignalsAgent</code> gathers category-level demand and market-trend signals.</p>
+<p>It focuses on:</p>
+<ul>
+<li>demand direction</li>
+<li>price pressure</li>
+<li>category momentum</li>
+<li>supporting signals that help the final report explain the market context</li>
+</ul>
+<h2>Specialized Tools Implemented</h2>
+<p>The repository implements the following specialized Python tools:</p>
+<ul>
+<li><code>pricing_intelligence</code></li>
+<li><code>review_corpus</code></li>
+<li><code>review_sentiment</code></li>
+<li><code>trend_signals</code></li>
+</ul>
+<p>in <code>agents/ecommerce_agents/tools.py</code>, along with fixture-backed providers in <code>agents/ecommerce_agents/providers/mock.py</code>.</p>
+<p>Tools:</p>
+<table>
+<thead><tr><th>Tool</th><th>Purpose</th><th>Current role</th></tr></thead>
+<tbody>
+<tr><td><code>pricing_intelligence</code></td><td>Normalizes price and offer data by product</td><td>Deterministic validation and future hybrid runtime</td></tr>
+<tr><td><code>review_corpus</code></td><td>Collects review-source evidence</td><td>Deterministic validation and future hybrid runtime</td></tr>
+<tr><td><code>review_sentiment</code></td><td>Extracts praise themes, pain points, and polarity</td><td>Deterministic validation and future hybrid runtime</td></tr>
+<tr><td><code>trend_signals</code></td><td>Summarizes category demand and price pressure</td><td>Deterministic validation and future hybrid runtime</td></tr>
+</tbody>
+</table>
+<p>Those modules are real, tested, and production-shaped The local tools are not the active ADK execution path today because the current runtime prioritizes search-grounded multi-agent orchestration to demonstrate end-to-end market research behavior in Google ADK. The tool layer is still implemented and tested as the modular capability layer for deterministic validation and future provider-backed integrations.</p>
+<p>Their current purpose is:</p>
+<ul>
+<li>deterministic unit testing</li>
+<li>stable local data-shape validation</li>
+<li>scaffolding for a future API-backed or hybrid tool layer</li>
+</ul>
+<p>A good future direction is to let the live search branches discover evidence and then gradually replace the highest-value branches with API-backed providers where structured freshness and source control are stronger.</p>
+<h2>Example End-to-End Behavior</h2>
+<h3>User input</h3>
+<pre><code class="language-text">Analyze Dyson V15</code></pre>
+<h3>Internal system behavior</h3>
+<ol>
+<li>The system resolves <code>Dyson V15</code> into <code>Dyson V15 Detect</code>.</li>
+<li>The system identifies the category as <code>cordless stick vacuum</code>.</li>
+<li>The system discovers likely competitors automatically.</li>
+<li>The parallel research stage gathers pricing, review, sentiment, and trend signals.</li>
+<li>The final analysis agent synthesizes those grounded inputs into one report.</li>
+</ol>
+<h3>Representative generated report</h3>
+<p>The following Markdown block is a real example captured from a successful local run for the request <code>iMac</code>. I kept the shorter Dyson walkthrough above as the easy architecture example, but this report is a stronger reviewer-facing sample because it shows the actual synthesis quality of the current runtime.</p>
+<p>This example is included directly in the README so the submission satisfies the deliverable asking for an example generated report without requiring the reviewer to open another file.</p>
+<p>For reviewers who want the raw captured runtime artifact, the full exported ADK session for this example is also available in <code>session-dea91c0c-fd25-4396-9bbb-cb572080cd8e.json</code>. That JSON includes the resolved state, intermediate research outputs, final report, and recorded events for the run.</p>
+<pre><code class="language-md"># iMac Market Analysis Report
+
+## executive_summary
+The Apple iMac continues to occupy a dominant position in the premium All-in-One
+(AIO) desktop market, largely propelled by its distinct minimalist design, 4.5K
+Retina display, and the highly efficient Apple Silicon (M-series)
+architecture. Synthesis of recent market data indicates that while the iMac
+holds strong brand loyalty and high overall customer satisfaction, it faces
+emerging pressure from premium Windows AIOs focusing on touchscreen
+capabilities and ergonomic flexibility. Furthermore, shifting consumer
+expectations regarding base memory (RAM) and the desire for larger screen form
+factors present distinct vulnerabilities in the current 24-inch lineup.
+
+## competitor_landscape
+The competitive set for the iMac consists of both volume-driven consumer AIOs
+and specialized premium creative workstations. Key rivals include:
+* **HP Envy AIO &amp; Dell Inspiron 24/27 AIO:** These represent the primary volume
+  competitors. They offer larger screen options and competitive processing
+  power at a lower entry price, appealing to budget-conscious home office
+  users.
+* **Lenovo Yoga AIO 9i:** A direct competitor in the premium design space. It
+  challenges the iMac&#x27;s aesthetic dominance with a sleek, architectural build
+  and offers 4K displays with robust internal specifications.
+* **Microsoft Surface Studio 2+:** Targeted at creative professionals, this
+  device competes with the iMac on premium build quality and display
+  excellence. Note on uncertainty: Evidence is mixed on whether consumers
+  directly cross-shop the Surface Studio 2+ with the standard iMac, given the
+  Surface&#x27;s significantly higher price point and specialized touchscreen/hinge
+  mechanics.
+
+## pricing_summary
+Pricing intelligence reveals that the iMac sits firmly in the premium tier of
+the consumer AIO market.
+* **iMac Pricing:** The base model currently starts at $1,299. However, Apple&#x27;s
+  upgrade pricing structure is steep, with memory and storage upgrades quickly
+  pushing the system into the $1,699 to $1,899 range.
+* **Competitor Pricing:** The broader PC AIO market averages between $800 and
+  $1,100. Competitors like Dell and HP offer 16GB of RAM and 1TB of storage at
+  price points where the iMac still provides 8GB of RAM and 256GB of storage.
+* **Value Perception:** Despite the premium, the iMac&#x27;s total cost of ownership
+  is often perceived favorably due to high resale value and bundled
+  peripherals, though the base model&#x27;s specification limits its perceived value
+  among power users.
+
+## customer_sentiment
+Analysis of the review corpus highlights a polarized but generally positive
+customer sentiment.
+* **Positive Drivers:** The 4.5K Retina display is universally praised for its
+  color accuracy and brightness. Users are highly satisfied with the M-series
+  chip performance, noting the system&#x27;s speed, efficiency, and virtually silent
+  operation. The slim profile and vibrant color options remain a major
+  purchasing driver for home users.
+* **Negative Drivers:** The most significant source of negative sentiment
+  surrounds the base model&#x27;s 8GB of unified memory, which many reviewers and
+  users feel is inadequate for a machine in this price bracket. Additionally,
+  ergonomic limitations and the persistent frustration over the Magic Mouse&#x27;s
+  bottom-facing charging port are frequently cited pain points.
+
+## market_trends
+Several overarching trend signals are actively shaping the AIO desktop market:
+* **The AI PC Era:** There is a heavy industry-wide shift toward marketing AI
+  capabilities. With the rollout of Apple Intelligence on macOS, consumers are
+  increasingly evaluating desktop purchases based on on-device machine learning
+  performance.
+* **Desire for Larger Displays:** Trend signals indicate strong consumer demand
+  for 27-inch and 32-inch form factors. The current limitation of the iMac to a
+  24-inch model is driving some prosumer demographics toward Mac Mini setups
+  paired with external monitors.
+* **Market Growth Constraints:** Note on uncertainty: Market signals are mixed
+  regarding the long-term growth of the AIO category. While remote work
+  initially boosted AIO sales, the increasing power of laptops coupled with
+  single-cable docking solutions is actively cannibalizing traditional desktop
+  market share.
+
+## recommendations
+1. **Revise Base Specifications:** Raise the baseline memory for the entry-level
+   iMac from 8GB to 16GB.
+2. **Expand Form Factor Options:** Reintroduce a larger 27-inch or 32-inch
+   variant to recapture the prosumer market.
+3. **Peripheral Redesign:** Redesign the Magic Mouse to allow simultaneous use
+   and charging, and offer a height-adjustable stand option.
+4. **Lean into Apple Intelligence Marketing:** Emphasize the localized privacy
+   and speed of the M-series Neural Engine against competitor AI PCs.</code></pre>
+<h2>Technical Direction</h2>
+<h3>Runtime target</h3>
+<ul>
+<li><strong>Language</strong>: Python 3.12</li>
+<li><strong>Framework</strong>: Google ADK</li>
+<li><strong>App name</strong>: <code>ecommerce_agents</code></li>
+<li><strong>Default model</strong>: <code>gemini-3.1-pro-preview</code></li>
+<li><strong>Runtime surfaces</strong>: ADK API Server and ADK Web UI</li>
+<li><strong>Local startup target</strong>: Docker Compose on macOS and Windows</li>
+</ul>
+<h2>Local Container Startup</h2>
+<p>The scaffold runs through Docker Compose so the same workflow works on macOS and Windows. The API service, ADK web UI, and test runner all reuse the same image.</p>
+<h3>1. Runtime environment</h3>
+<p>For the fastest local run, edit <code>docker-compose.yml</code> in <code>x-app-common.environment</code> and replace:</p>
+<pre><code class="language-text">GOOGLE_API_KEY: GEMINI_API_KEY_HERE</code></pre>
+<p>with a valid Gemini API key, then rebuild the container.</p>
+<p>That declaration is shared by all Compose services, so one change covers:</p>
+<ul>
+<li><code>market-analysis-web</code></li>
+<li><code>market-analysis-agent</code></li>
+<li><code>market-analysis-test</code></li>
+</ul>
+<p>The important reviewer-facing point is that there is no second config file to edit in order to provide the key.</p>
+<p>In the compose file, the runtime also supports these optional values:</p>
+<ul>
+<li><code>ADK_MODEL</code></li>
+<li><code>DEFAULT_MARKET</code></li>
+<li><code>ANALYSIS_DB_PATH</code></li>
+</ul>
+<p>If <code>ANALYSIS_DB_PATH</code> is not set, the app defaults to a repo-local SQLite file at <code>.adk/analysis_history.db</code>.</p>
+<h3>2. Model selection</h3>
+<p>The project now defaults to <code>gemini-3.1-pro-preview</code>. As of March 10, 2026, the Gemini API models page deprecates Gemini 3 Pro Preview and points developers to Gemini 3.1 Pro Preview. The dedicated Gemini 3.1 Pro Preview model page, last updated March 18, 2026, lists Search grounding as supported, so this repository uses that newer model for live grounded research.</p>
+<h3>3. Optional preflight check</h3>
+<p>Before the first boot, you can validate the Compose file without starting containers:</p>
+<pre><code class="language-bash">docker compose config</code></pre>
+<h3>4. Helper scripts</h3>
+<p>If you want shorter commands, use the helper scripts.</p>
+<p>Windows:</p>
+<pre><code class="language-cmd">scripts\adk.cmd init-env
+scripts\adk.cmd config
+scripts\adk.cmd web -Build
+scripts\adk.cmd api -Build
+scripts\adk.cmd test</code></pre>
+<p>macOS and Linux:</p>
+<pre><code class="language-bash">bash scripts/adk.sh init-env
+bash scripts/adk.sh config
+bash scripts/adk.sh web --build
+bash scripts/adk.sh api --build
+bash scripts/adk.sh test</code></pre>
+<h3>5. Daily development mode with ADK Web</h3>
+<p>For day-to-day development, start the web UI first:</p>
+<pre><code class="language-bash">docker compose --profile web up --build market-analysis-web</code></pre>
+<p>Then open:</p>
+<pre><code class="language-text">http://localhost:8001</code></pre>
+<p>Inside the UI, select the <code>ecommerce_agents</code> app.</p>
+<h3>6. API testing mode</h3>
+<p>When you want to validate the REST integration path, start the API server:</p>
+<pre><code class="language-bash">docker compose up --build market-analysis-agent</code></pre>
+<p>Useful endpoints:</p>
+<ul>
+<li><code>http://localhost:8000/docs</code></li>
+<li><code>http://localhost:8000/list-apps</code></li>
+</ul>
+<p><code>/list-apps</code> should include <code>ecommerce_agents</code>.</p>
+<p>When calling the API directly, use:</p>
+<pre><code class="language-json">{
+  &quot;appName&quot;: &quot;ecommerce_agents&quot;
+}</code></pre>
+<p>Representative request bodies are:</p>
+<p>Create a session:</p>
+<pre><code class="language-json">{}</code></pre>
+<p>Run an analysis:</p>
+<pre><code class="language-json">{
+  &quot;appName&quot;: &quot;ecommerce_agents&quot;,
+  &quot;userId&quot;: &quot;u_123&quot;,
+  &quot;sessionId&quot;: &quot;s_123&quot;,
+  &quot;newMessage&quot;: {
+    &quot;role&quot;: &quot;user&quot;,
+    &quot;parts&quot;: [
+      {
+        &quot;text&quot;: &quot;Analyze Dyson V15&quot;
+      }
+    ]
+  }
+}</code></pre>
+<p>Representative HTTP request example:</p>
+<pre><code class="language-bash">curl -X POST http://localhost:8000/run \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{
+    &quot;appName&quot;: &quot;ecommerce_agents&quot;,
+    &quot;userId&quot;: &quot;u_123&quot;,
+    &quot;sessionId&quot;: &quot;s_123&quot;,
+    &quot;newMessage&quot;: {
+      &quot;role&quot;: &quot;user&quot;,
+      &quot;parts&quot;: [
+        {
+          &quot;text&quot;: &quot;Analyze Dyson V15&quot;
+        }
+      ]
+    }
+  }&#x27;</code></pre>
+<h3>7. Run tests in the container</h3>
+<p>Use the dedicated test service:</p>
+<pre><code class="language-bash">docker compose --profile test run --rm market-analysis-test</code></pre>
+<p>or run tests inside the running web container:</p>
+<pre><code class="language-bash">docker compose exec market-analysis-web pytest -q</code></pre>
+<h3>8. Testing</h3>
+<p>The current automated suite focuses on the parts of the app that are the most important and the most fragile in a multi-agent ADK workflow:</p>
+<ul>
+<li>agent construction and wiring</li>
+<li>request parsing and routing</li>
+<li>orchestrator behavior</li>
+<li>deterministic tool and provider outputs</li>
+<li>durable SQLite persistence</li>
+<li>basic repository/documentation presence</li>
+</ul>
+<p>These tests were chosen because they protect the business-critical path of the application. If agent wiring breaks, the app does not start. If routing breaks, the app asks the wrong question or analyzes the wrong product. If orchestration breaks, the clarification branch, competitor discovery, or final synthesis can fail silently. If storage breaks, completed analyses are lost or overwritten.</p>
+<p>#### Why each test group is relevant</p>
+<ul>
+<li><code>tests/test_agent_definition.py</code></li>
+<li>Checks that the ADK graph imports cleanly and that the expected agents are</li>
+</ul>
+<p>present.</p>
+<ul>
+<li>This is relevant because bad agent wiring prevents the whole runtime from</li>
+</ul>
+<p>loading.</p>
+<ul>
+<li><code>tests/test_agent_orchestration.py</code></li>
+<li>Checks the custom orchestrator flow, especially progress events and the</li>
+</ul>
+<p>clarification branch.</p>
+<ul>
+<li>This is relevant because orchestration is the core logic of the app.</li>
+<li><code>tests/test_config.py</code></li>
+<li>Checks default model, default market, and the SQLite path.</li>
+<li>This is relevant because broken defaults fail before the user can even run</li>
+</ul>
+<p>an analysis.</p>
+<ul>
+<li><code>tests/test_routing.py</code></li>
+<li>Checks scope parsing, clarification detection, fenced JSON handling, and</li>
+</ul>
+<p>fallback behavior.</p>
+<ul>
+<li>This is relevant because every request passes through routing first.</li>
+<li><code>tests/test_tools.py</code></li>
+<li>Checks the pricing, review, sentiment, and trend tool wrappers.</li>
+<li>This is relevant because those helpers define the expected structure of</li>
+</ul>
+<p>downstream market data.</p>
+<ul>
+<li><code>tests/test_mock_providers.py</code></li>
+<li>Checks the fixture-backed mock providers.</li>
+<li>This is relevant because they give deterministic local validation without</li>
+</ul>
+<p>depending on external APIs.</p>
+<ul>
+<li><code>tests/test_storage.py</code></li>
+<li>Checks snapshot creation and SQLite save/read behavior.</li>
+<li>This is relevant because completed analyses now need durable storage.</li>
+<li><code>tests/test_persistence_flow.py</code></li>
+<li>Checks the end-to-end persistence rules from the orchestrator.</li>
+<li>This is relevant because successful runs must persist, clarification-only</li>
+</ul>
+<p>runs must not persist, and storage failures must not block the final answer.</p>
+<ul>
+<li><code>tests/test_readme_exists.py</code></li>
+<li>Checks that the repository still contains its main documentation file.</li>
+<li>This is relevant because the assignment requires a runnable and documented</li>
+</ul>
+<p>submission.</p>
+<p>#### Declared automated tests</p>
+<ul>
+<li><code>tests/test_agent_definition.py</code></li>
+<li><code>test_root_agent_and_parallel_research_agents_import_cleanly</code></li>
+<li><code>tests/test_agent_orchestration.py</code></li>
+<li><code>test_internal_research_events_are_hidden_but_progress_is_visible</code></li>
+<li><code>test_clarification_branch_keeps_follow_up_visible</code></li>
+<li><code>tests/test_config.py</code></li>
+<li><code>test_default_market_matches_architecture_examples</code></li>
+<li><code>test_default_model_uses_gemini_3_1_pro_preview_for_search_grounding</code></li>
+<li><code>test_analysis_db_path_defaults_to_repo_local_adk_storage</code></li>
+<li><code>tests/test_routing.py</code></li>
+<li><code>test_greeting_scope_requires_clarification</code></li>
+<li><code>test_valid_scope_continues_research</code></li>
+<li><code>test_parse_research_scope_accepts_fenced_json</code></li>
+<li><code>test_invalid_scope_defaults_to_clarification</code></li>
+<li><code>tests/test_mode.py</code></li>
+<li><code>test_normalize_mode_accepts_supported_values_case_insensitively</code></li>
+<li><code>test_extract_mode_and_clean_text_handles_inline_mode_selection</code></li>
+<li><code>test_extract_mode_and_clean_text_handles_mode_only_messages</code></li>
+<li><code>test_mode_messages_reflect_live_key_availability</code></li>
+<li><code>tests/test_mock_providers.py</code></li>
+<li><code>test_mock_pricing_provider_returns_products</code></li>
+<li><code>test_mock_review_provider_injects_product_name</code></li>
+<li><code>test_mock_trend_provider_formats_summary</code></li>
+<li><code>tests/test_tools.py</code></li>
+<li><code>test_pricing_intelligence_wraps_provider_payload</code></li>
+<li><code>test_review_corpus_returns_reviews_by_product</code></li>
+<li><code>test_review_sentiment_returns_product_summaries</code></li>
+<li><code>test_trend_signals_returns_category_context</code></li>
+<li><code>tests/test_storage.py</code></li>
+<li><code>test_build_analysis_snapshot_extracts_scope_report_and_citations</code></li>
+<li><code>test_sqlite_analysis_store_round_trips_snapshots_and_filters_recent</code></li>
+<li><code>test_sqlite_analysis_store_keeps_multiple_runs_for_same_session</code></li>
+<li><code>tests/test_persistence_flow.py</code></li>
+<li><code>test_build_analysis_snapshot_from_context_reads_final_report_and_request</code></li>
+<li><code>test_full_run_persists_completed_analysis_snapshot</code></li>
+<li><code>test_clarification_path_does_not_persist_analysis</code></li>
+<li><code>test_persistence_failure_keeps_final_report_in_event_stream</code></li>
+<li><code>tests/test_readme_exists.py</code></li>
+<li><code>test_readme_exists</code></li>
+</ul>
+<p><code>tests/test_mode.py</code> covers a small parser helper retained from a previous UI mode-selection exploration. It is currently not part of the active <code>root_agent</code> runtime path, so it should be interpreted as stable utility coverage rather than as a core execution-path test.</p>
+<p>#### Manual tests</p>
+<p>These manual checks complement the automated tests by confirming that the containerized runtime and ADK interfaces work end to end:</p>
+<ol>
+<li>Validate Compose with <code>docker compose config</code>.</li>
+<li>Start the ADK web UI with <code>docker compose --profile web up --build market-analysis-web</code>.</li>
+<li>Open <code>http://localhost:8001</code>.</li>
+<li>Create a session in the ADK web UI.</li>
+<li>Send an analysis request and inspect state and event history.</li>
+<li>Start the ADK API server with <code>docker compose up --build market-analysis-agent</code>.</li>
+<li>Create a session through the API with an empty JSON body.</li>
+<li>Run an analysis through <code>/run</code> with the request body shown in the API section above.</li>
+<li>Run the containerized automated suite with <code>docker compose --profile test run --rm market-analysis-test</code>.</li>
+</ol>
+<h2>Error Handling</h2>
+<p>The current implementation includes a few explicit error-handling decisions that are important for reviewer understanding:</p>
+<ul>
+<li>if the research scope is ambiguous, the system falls back to a clarification</li>
+</ul>
+<p>question instead of generating a weak report</p>
+<ul>
+<li>clarification-only runs are not persisted in the durable analysis store</li>
+<li>persistence failures are logged, but they do not block the final user-facing</li>
+</ul>
+<p>report from being returned</p>
+<ul>
+<li>invalid or unparseable structured scope output safely falls back to</li>
+</ul>
+<p>clarification behavior</p>
+<p>These choices are important because they favor a predictable user experience and reduce the risk of silently storing incomplete or low-confidence analyses.</p>
+<h2>Step 4. Data Architecture and Storage</h2>
+<p>This section answers the assignment question about how data should be stored and why.</p>
+<h3>Current implemented approach</h3>
+<p>The current code uses a two-tier storage model:</p>
+<ul>
+<li>transient agent outputs stay in ADK session state</li>
+<li>completed analyses are persisted in SQLite because it keeps the project simple,</li>
+</ul>
+<p>executable, and easy to review.</p>
+<p>This is implemented because the two data classes have different lifecycles:</p>
+<ul>
+<li>session state is ideal for short-lived orchestration context during one run</li>
+<li>durable analysis history needs stable records that survive process restarts</li>
+</ul>
+<h3>Data model</h3>
+<p>The durable analysis record stores:</p>
+<table>
+<thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>analysis_id</code></td><td>Stable identifier for one completed run</td></tr>
+<tr><td><code>session_id</code></td><td>Session-level grouping</td></tr>
+<tr><td><code>user_id</code></td><td>User-level grouping</td></tr>
+<tr><td><code>created_at</code></td><td>Run timestamp</td></tr>
+<tr><td><code>request_text</code></td><td>Original request text</td></tr>
+<tr><td><code>product_name</code></td><td>Normalized primary product</td></tr>
+<tr><td><code>category</code></td><td>Normalized category</td></tr>
+<tr><td><code>market</code></td><td>Normalized market</td></tr>
+<tr><td><code>status</code></td><td>Durable record status</td></tr>
+<tr><td><code>final_report_markdown</code></td><td>Final user-facing report</td></tr>
+<tr><td><code>state_snapshot_json</code></td><td>JSON snapshot of core intermediate results</td></tr>
+<tr><td><code>citations_json</code></td><td>Extracted source URLs</td></tr>
+</tbody>
+</table>
+<h3>Recommended production architecture</h3>
+<p>For a production version, I would likely move from SQLite to a document-oriented database. The main reason is that the application already produces nested JSON-shaped outputs such as research scope, competitor sets, pricing intelligence, review sentiment, trend signals, citations, and the final report snapshot. A document-oriented store fits that structure naturally, reduces the need to flatten or transform payloads into many relational tables, and makes schema evolution easier as agent outputs change over time.</p>
+<p>This choice also reduces the impedance mismatch between the in-memory ADK session state and the persisted storage model.</p>
+<h2>Step 5. Monitoring and Observability</h2>
+<p>This section answers the assignment question about tracing, metrics, alerting, and output quality.</p>
+<h3>Tracing approach</h3>
+<p>I would trace each analysis as one parent span with child spans for:</p>
+<ul>
+<li>research scope resolution</li>
+<li>clarification branch if triggered</li>
+<li>competitor discovery</li>
+<li>each parallel research branch</li>
+<li>final synthesis</li>
+<li>persistence</li>
+</ul>
+<p>Every span should include:</p>
+<ul>
+<li><code>analysis_id</code></li>
+<li><code>session_id</code></li>
+<li><code>user_id</code></li>
+<li>model name</li>
+<li>market</li>
+<li>product category</li>
+<li>success or failure state</li>
+</ul>
+<h3>Performance metrics</h3>
+<p>The most useful operational metrics are:</p>
+<ul>
+<li>total analysis latency</li>
+<li>latency per stage</li>
+<li>success rate</li>
+<li>clarification rate</li>
+<li>persistence failure rate</li>
+<li>average citations per report</li>
+<li>token usage and estimated model cost per run</li>
+<li>percentage of runs missing one or more branch outputs</li>
+</ul>
+<h3>Alerting strategy</h3>
+<p>I would alert on:</p>
+<ul>
+<li>sustained failure rate above threshold</li>
+<li>persistence failures above threshold</li>
+<li>stage timeouts or unusually high latency</li>
+<li>empty or near-empty final reports</li>
+<li>sudden drop in citation count or branch completion rate</li>
+</ul>
+<h3>Measuring output quality</h3>
+<p>I would track quality using:</p>
+<ul>
+<li>citation count and citation coverage by section</li>
+<li>schema completeness of state outputs</li>
+<li>user feedback scores</li>
+<li>periodic human review of sampled reports</li>
+<li>automated LLM-as-judge scoring for relevance, completeness, and actionability</li>
+</ul>
+<h2>Step 6. Scaling and Optimization</h2>
+<p>This section answers the assignment question about concurrency, cost, caching, and parallelization.</p>
+<h3>Handling 100+ concurrent analyses</h3>
+<p>For significant load, I would separate the synchronous API layer from the execution workers:</p>
+<ul>
+<li>API service accepts requests and creates jobs</li>
+<li>a queue distributes jobs to worker containers</li>
+<li>workers run the orchestrator and write progress and final outputs</li>
+<li>autoscaling is driven by queue depth and average execution latency</li>
+</ul>
+<h3>Cost optimization</h3>
+<p>The strongest cost controls are:</p>
+<ul>
+<li>early clarification before expensive downstream research which is already in place</li>
+<li>caching repeated product and competitor lookups with freshness windows</li>
+<li>reusing normalized competitor sets for repeated products in the same market</li>
+<li>setting hard limits on search breadth and report length</li>
+<li>routing only the highest-value steps to the most expensive models</li>
+</ul>
+<h3>Intelligent caching</h3>
+<p>I would cache:</p>
+<ul>
+<li>normalized research scopes by request signature</li>
+<li>competitor sets by canonical product plus market</li>
+<li>tool or search results by product plus market plus freshness window</li>
+<li>final reports only when the request is exactly repeated and freshness is still</li>
+</ul>
+<p>acceptable</p>
+<h3>Parallelization strategy</h3>
+<p>The current code already uses a <code>ParallelAgent</code> for independent research branches. That is the right pattern because pricing, review evidence, sentiment, and trends can run concurrently after competitor discovery is stable.</p>
+<p>For larger scale, I would keep this same logical split but place branch workers behind queue-based execution and per-provider rate limits.</p>
+<h2>Known Limitations</h2>
+<p>The current submission is intentionally scoped to be executable, reviewable, and focused on orchestration. Reviewers should be aware of these limits:</p>
+<ul>
+<li>live analysis depends on a valid Gemini API key</li>
+<li>live grounded outputs depend on external search availability and freshness</li>
+<li>the specialized Python tool layer is implemented and tested, but the active</li>
+</ul>
+<p>live runtime currently uses search-grounded specialist agents rather than the local tool functions for end-to-end execution</p>
+<ul>
+<li>production monitoring, autoscaling, and A/B evaluation are documented in this</li>
+</ul>
+<p>README as design recommendations rather than fully shipped infrastructure</p>
+<h2>Step 7. Continuous Improvement and A/B Testing</h2>
+<p>This section answers the assignment question about quality evaluation, prompt comparison, user feedback, and iterative capability growth.</p>
+<h3>Automatic quality evaluation</h3>
+<p>I would use a two-layer quality loop:</p>
+<ul>
+<li>deterministic checks for schema completeness, missing citations, and report</li>
+</ul>
+<p>section coverage</p>
+<ul>
+<li>LLM-as-judge scoring for strategic usefulness, factual grounding, clarity, and</li>
+</ul>
+<p>recommendation quality</p>
+<h3>Prompt experimentation</h3>
+<p>Prompt changes should be versioned explicitly. I would compare prompt versions on a fixed benchmark set of representative product requests and track:</p>
+<ul>
+<li>latency</li>
+<li>token cost</li>
+<li>citation coverage</li>
+<li>judge score</li>
+<li>human preference on sampled outputs</li>
+</ul>
+<h3>User feedback loop</h3>
+<p>The most useful lightweight feedback signals are:</p>
+<ul>
+<li>thumbs up or down on the final report</li>
+<li>optional free-text feedback</li>
+<li>whether the user asks for a regeneration or clarification</li>
+<li>whether the user exports or revisits the result later</li>
+</ul>
+<h3>Capability evolution</h3>
+<p>I would improve the system in this order:</p>
+<ul>
+<li>strengthen source preservation and citations</li>
+<li>replace the highest-value mocked or search-heavy branches with structured data providers</li>
+<li>add confidence and freshness scoring to the final report</li>
+<li>introduce benchmark datasets and regression evaluation before each release</li>
+</ul>
+<h2>Next Development Steps</h2>
+<p>The most useful next steps now that the parallel live-research flow is in place are:</p>
+<ol>
+<li>Preserve source URLs and clearer citations from each research branch.</li>
+<li>Add end-to-end orchestration tests around clarification, competitor discovery, and synthesis.</li>
+<li>Decide which research branches should stay search-first and which should move to API-backed collectors.</li>
+<li>Add freshness and confidence scoring that the final report can surface explicitly.</li>
+<li>Keep the fixture-backed tool layer aligned with the live runtime outputs or retire it if it stops adding value.</li>
+<li>Add an <code>Agents to UI</code> layer so the interface delivers clearer business signals, trade-offs, and recommendations and supports more comprehensive decision-making.</li>
+</ol>
+<h2>Trade-Offs</h2>
+<ul>
+<li>A multi-agent workflow is more verbose than a single agent, but it is easier to test, inspect, and reason about.</li>
+<li>A dedicated clarification agent adds one more step, but it keeps user follow-ups clean and predictable.</li>
+<li>Parallel research improves latency, but the branches do not automatically share intermediate reasoning while they run.</li>
+<li>Search-based sentiment is flexible, but it is less deterministic than sentiment computed from one normalized review corpus.</li>
+<li>Keeping legacy tools and mock providers helps testing, but it creates a maintenance obligation to keep those structures aligned with the live runtime.</li>
+</ul>
+<h2>Summary</h2>
+<p>The current best-fit architecture for this repository is:</p>
+<ul>
+<li>a simple user-facing experience</li>
+<li>a custom ADK orchestrator for branching logic</li>
+<li>a search-capable research-scoping stage</li>
+<li>a dedicated clarification stage</li>
+<li>automatic competitor discovery</li>
+<li>a parallel live market-research stage for independent research branches</li>
+<li>a final synthesis agent grounded in session state</li>
+</ul>
+<p>In summary:</p>
+<blockquote>
+<p>The user says what product they want to analyze.</p>
+<p>The system figures out the scope, competitors, live signals, and final report.</p>
+</blockquote>
+</main>
+</body>
+</html>

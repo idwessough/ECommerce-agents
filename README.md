@@ -2,14 +2,13 @@
 
 ## Architecture
 
-Ce dépôt contient une application Google ADK exposée sous le nom
-`ecommerce_agents`. Son objectif est de transformer une demande produit simple
-en un rapport structuré d'analyse de marché pour une équipe e-commerce.
+Ce repository contient une application Google ADK 
+`ecommerce_agents`. Son objectif est de générer un rapport structuré d'analyse de marché pour une équipe e-commerce. 
 
-Ce README est volontairement autonome pour l'évaluation. Il regroupe la
+ Il regroupe la
 justification d'architecture, les étapes d'installation et d'utilisation, des
 exemples d'API, la stratégie de test, un exemple représentatif de rapport
-généré, ainsi que les réponses rédigées aux questions théoriques du test.
+généré, ainsi que les réponses rédigées .
 
 Exemple d'entrée :
 
@@ -42,13 +41,50 @@ Le système doit automatiquement :
 - normaliser le nom du produit
 - déduire la marque, la catégorie et le marché cible
 - découvrir les concurrents les plus pertinents
-- collecter des signaux en direct de prix, d'avis, de sentiment et de tendance
+- chercher des signaux en direct de prix, d'avis, de sentiment et de tendance
 - synthétiser un rapport final d'analyse de marché
 
 L'utilisateur ne doit pas avoir à expliquer comment fonctionne la découverte des
 concurrents ni comment la recherche doit être conduite. Le système ne doit
 poser une question complémentaire que lorsque la demande produit est réellement
 ambiguë.
+
+## Démarrage rapide
+
+Pour lancer l'application simplement :
+
+1. Ouvrez `docker-compose.yml`.
+2. Allez à la section partagée `x-app-common.environment`.
+3. Remplacez la ligne suivante :
+
+```text
+GOOGLE_API_KEY: GEMINI_API_KEY_HERE
+```
+
+par une clé Gemini valide.
+
+Important : cette ligne est déclarée une seule fois dans `x-app-common`, donc
+elle alimente à la fois l'interface web, l'API et le runner de tests. Les
+reviewers n'ont pas besoin de modifier un autre fichier pour démarrer.
+
+Ensuite lancez simplement :
+
+```bash
+docker compose --profile web up --build market-analysis-web
+```
+
+Puis ouvrez :
+
+```text
+http://localhost:8001
+```
+
+Si la clé API est changée après un premier démarrage, il faut recréer le
+conteneur pour recharger l'environnement :
+
+```bash
+docker compose --profile web up -d --build --force-recreate market-analysis-web
+```
 
 ## Objectif produit
 
@@ -93,8 +129,8 @@ Exemples :
 
 ### Décision
 
-La solution recommandée actuellement est un petit système multi-agents ADK avec
-branchement explicite et une étape de recherche parallèle en direct.
+La solution recommandée actuellement est un système multi-agents ADK avec
+branchement explicite et une étape de recherche parallèle.
 
 ### Pourquoi cette architecture
 
@@ -127,6 +163,45 @@ Cette approche s'aligne bien avec la documentation ADK :
   supporté par Gemini 3.1 Pro Preview, c'est pourquoi le projet utilise par
   défaut `gemini-3.1-pro-preview` pour la recherche en direct ancrée sur le web
 
+### Pourquoi Google ADK plutôt qu'une approche plus simple
+
+Le choix de Google ADK est intentionnel et va au-delà du simple fait d'utiliser
+un framework agentique. Le problème à résoudre n'est pas seulement
+d'appeler un modèle une fois : il faut chaîner plusieurs étapes, partager un
+état structuré entre elles, poser une clarification conditionnelle, lancer une
+recherche parallèle, puis exposer le même graphe à la fois en interface web et
+en API.
+
+Par rapport à une orchestration plus artisanale en Python ou via un simple
+serveur web, ADK réduit fortement le code de glue autour :
+
+- du routage entre agents
+- de l'état de session partagé
+- du streaming d'événements
+- de l'exécution parallèle
+- de l'exposition du workflow via des surfaces standard comme ADK Web et ADK
+  API Server
+
+Ce choix est aussi plus robuste pour la suite du projet. Si l'application doit
+évoluer demain, il sera plus simple :
+
+- d'ajouter un nouvel agent spécialisé sans réécrire tout 
+- de remplacer une branche de recherche par un outil ou une intégration API
+  dédiée
+- d'introduire plus tard du cache, une file de jobs, ou une exécution asynchrone
+- de conserver une séparation claire entre orchestration, collecte de données
+  et synthèse finale
+- d'observer le système au niveau des sessions, des événements et des sorties
+  d'agents
+
+Autrement dit, ADK apporte ici une meilleure scalabilité fonctionnelle : le
+workflow peut croître en complexité sans devenir un enchaînement fragile de
+conditions et d'appels manuels. Pour la production, il faudra toujours compléter
+le dispositif par une base de données plus solide, du cache, du monitoring et
+éventuellement une exécution asynchrone, mais ADK fournit déjà une base
+d'orchestration plus propre et plus extensible que des alternatives plus
+minimalistes.
+
 ### Pattern d'orchestration recommandé
 
 ```text
@@ -141,8 +216,7 @@ MarketAnalysisOrchestrator(
 
 ## Couche d'outils spécialisée
 
-Cette soumission implémente quatre outils spécialisés sous forme de composants
-métier modulaires :
+Cette solution contient Plusieurs outils spécialisés sous forme de composants métier modulaires :
 
 - `pricing_intelligence`
 - `review_corpus`
@@ -167,7 +241,7 @@ fonctions spécialisées.
 
 Le runtime ADK actif est aujourd'hui orienté agents. Dans le chemin
 d'exécution en direct, les agents spécialisés utilisent `google_search` pour
-collecter des preuves ancrées, tandis que la couche d'outils reste disponible
+chercher des preuves ancrées, tandis que la couche d'outils reste disponible
 comme couche modulaire de capacités pour les tests, la validation
 déterministe, et une future intégration avec des sources de données e-commerce
 structurées.
@@ -177,12 +251,12 @@ Le dépôt contient toujours des fonctions Python locales dans
 fixtures dans `agents/ecommerce_agents/providers/mock.py`, mais ils ne
 constituent plus aujourd'hui le chemin principal d'exécution de l'application
 ADK. Le workflow en cours utilise des agents spécialisés capables de faire des
-recherches pour collecter des preuves en direct et stocker leurs sorties
+recherches pour chercher des preuves en direct et stocker leurs sorties
 directement dans l'état de session.
 
 Ces outils locaux restent importants pour deux raisons :
 
-- ils fournissent des structures déterministes pour les tests unitaires et la
+- ils fournissent des structures heuristiques pour les tests unitaires et la
   validation locale à partir de fixtures
 - ils offrent un point d'extension propre si le projet ajoute plus tard des
   collecteurs basés sur des API derrière des outils Python
@@ -732,14 +806,24 @@ réutilisent la même image.
 
 ### 1. Environnement d'exécution
 
-Pour le démarrage local le plus rapide, modifiez `docker-compose.yml` et
-remplacez :
+Pour le démarrage local le plus rapide, modifiez `docker-compose.yml` à
+l'emplacement `x-app-common.environment` et remplacez :
 
 ```text
 GOOGLE_API_KEY: GEMINI_API_KEY_HERE
 ```
 
 par une clé Gemini valide, puis reconstruisez le conteneur.
+
+Cette déclaration est mutualisée pour tous les services Compose. Une seule
+modification suffit donc pour :
+
+- `market-analysis-web`
+- `market-analysis-agent`
+- `market-analysis-test`
+
+Le point important pour un reviewer est qu'il n'y a pas d'autre fichier de
+configuration à modifier pour fournir la clé.
 
 Dans le fichier Compose, le runtime supporte aussi les valeurs optionnelles
 suivantes :
@@ -1281,6 +1365,9 @@ direct parallèle est en place sont :
    final
 5. garder la couche d'outils alimentée par fixtures alignée avec les sorties du
    runtime live, ou la retirer si elle cesse d'apporter de la valeur
+6. ajouter une couche `Agents to UI` pour restituer plus clairement les signaux,
+   arbitrages et recommandations métier dans l'interface et mieux soutenir la
+   prise de décision business
 
 ## Trade-offs
 
