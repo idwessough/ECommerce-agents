@@ -98,7 +98,7 @@ This architecture prioritizes:
 - predictable orchestration
 - explicit state handoffs between stages
 - easy testing and inspection
-- extensibility for future API-backed collectors
+- extensibility for future API-backed providers
 
 ## User Experience
 
@@ -125,7 +125,7 @@ The current recommended solution is a small ADK multi-agent system with explicit
 
 ### Why this architecture
 
-The current implementation follows the ADK patterns that fit the problem best:
+The current architecture follows the ADK patterns that best fit the business goal:
 
 - a custom `BaseAgent` orchestrator for conditional control flow
 - a search-capable `ResearchScopeAgent` to resolve the request into structured state
@@ -162,10 +162,10 @@ single-agent setup, ADK removes a large amount of glue code around:
 This is also the more scalable architectural choice for the future of the
 project. If the app evolves, it will be easier:
 
-- to add a new specialist agent without rewriting 
-- to replace one research branch with a dedicated tool or API-backed collector
+- to add a new specialist agent simply 
+- to replace one research branch with a dedicated tool or API-backed provider
 - to introduce caching, job queues, or async execution later
-- to preserve a clean separation between orchestration, data collection, and
+- to preserve a clean separation between orchestration, data acquisition, and
   final synthesis
 - to observe behavior at the session, event, and agent-output level
 
@@ -1226,7 +1226,7 @@ The most useful next steps now that the parallel live-research flow is in place 
 
 1. Preserve source URLs and clearer citations from each research branch.
 2. Add end-to-end orchestration tests around clarification, competitor discovery, and synthesis.
-3. Decide which research branches should stay search-first and which should move to API-backed collectors.
+3. Decide which research branches should stay search-first and which should move to API-backed providers.
 4. Add freshness and confidence scoring that the final report can surface explicitly.
 5. Keep the fixture-backed tool layer aligned with the live runtime outputs or retire it if it stops adding value. 
 6. Add an `Agents to UI` layer so the interface delivers clearer business

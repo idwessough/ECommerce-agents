@@ -46,10 +46,10 @@ Le système doit automatiquement :
 
 L'utilisateur ne doit pas avoir à expliquer comment fonctionne la découverte des
 concurrents ni comment la recherche doit être conduite. Le système ne doit
-poser une question complémentaire que lorsque la demande produit est réellement
+poser une question complémentaire que lorsque la demande est réellement
 ambiguë.
 
-## Démarrage rapide
+## Démarrage 
 
 Pour lancer l'application simplement :
 
@@ -64,8 +64,7 @@ GOOGLE_API_KEY: GEMINI_API_KEY_HERE
 par une clé Gemini valide.
 
 Important : cette ligne est déclarée une seule fois dans `x-app-common`, donc
-elle alimente à la fois l'interface web, l'API et le runner de tests. Les
-reviewers n'ont pas besoin de modifier un autre fichier pour démarrer.
+elle alimente à la fois l'interface web, l'API et le runner de tests. 
 
 Ensuite lancez simplement :
 
@@ -105,7 +104,7 @@ Cette architecture privilégie :
 - une orchestration prévisible
 - des transferts d'état explicites entre les étapes
 - une facilité de test et d'inspection
-- une extensibilité vers de futurs collecteurs connectés à des API
+- une extensibilité vers de futurs providers connectés à des API
 
 ## Expérience utilisateur
 
@@ -134,8 +133,7 @@ branchement explicite et une étape de recherche parallèle.
 
 ### Pourquoi cette architecture
 
-L'implémentation actuelle suit les patterns ADK qui correspondent le mieux au
-problème :
+L'architecture actuelle suit les patterns ADK qui correspondent le mieux au business :
 
 - un orchestrateur personnalisé basé sur `BaseAgent` pour le contrôle
   conditionnel du flux
@@ -157,16 +155,14 @@ Cette approche s'aligne bien avec la documentation ADK :
 - `ParallelAgent` est le bon choix lorsque les tâches aval sont indépendantes et
   bénéficient de la concurrence
 - ce projet garde encore `google_search` isolé dans des agents spécialisés
-  comme choix conservateur, même si les versions récentes d'ADK Python offrent
-  davantage de flexibilité que les anciennes intégrations
-- la documentation actuelle de l'API Gemini indique que Search grounding est
-  supporté par Gemini 3.1 Pro Preview, c'est pourquoi le projet utilise par
-  défaut `gemini-3.1-pro-preview` pour la recherche en direct ancrée sur le web
+comme choix conservateur, même si les versions récentes d'ADK Python offrent
+  davantage de flexibilité que les anciennes releases
+- la documentation actuelle de l'API Gemini indique que Search grounding est supporté par Gemini 3.1 Pro Preview, c'est pourquoi le projet utilise par défaut `gemini-3.1-pro-preview` pour la recherche groundée sur le web
 
 ### Pourquoi Google ADK plutôt qu'une approche plus simple
 
 Le choix de Google ADK est intentionnel et va au-delà du simple fait d'utiliser
-un framework agentique. Le problème à résoudre n'est pas seulement
+un framework agentique. Le projet n'est pas seulement
 d'appeler un modèle une fois : il faut chaîner plusieurs étapes, partager un
 état structuré entre elles, poser une clarification conditionnelle, lancer une
 recherche parallèle, puis exposer le même graphe à la fois en interface web et
@@ -189,14 +185,12 @@ Ce choix est aussi plus robuste pour la suite du projet. Si l'application doit
 - de remplacer une branche de recherche par un outil ou une intégration API
   dédiée
 - d'introduire plus tard du cache, une file de jobs, ou une exécution asynchrone
-- de conserver une séparation claire entre orchestration, collecte de données
+- de conserver une séparation claire entre orchestration, récupération de données
   et synthèse finale
-- d'observer le système au niveau des sessions, des événements et des sorties
-  d'agents
+- d'observer le système au niveau des sessions, des événements et des sorties d'agents
 
 Autrement dit, ADK apporte ici une meilleure scalabilité fonctionnelle : le
-workflow peut croître en complexité sans devenir un enchaînement fragile de
-conditions et d'appels manuels. Pour la production, il faudra toujours compléter
+workflow peut croître en complexité devenant un enchaînement solide et maintenable. Pour la production, il faudra toujours compléter
 le dispositif par une base de données plus solide, du cache, du monitoring et
 éventuellement une exécution asynchrone, mais ADK fournit déjà une base
 d'orchestration plus propre et plus extensible que des alternatives plus
@@ -214,9 +208,9 @@ MarketAnalysisOrchestrator(
 )
 ```
 
-## Couche d'outils spécialisée
+## Couche d'outils 
 
-Cette solution contient Plusieurs outils spécialisés sous forme de composants métier modulaires :
+Cette solution contient Plusieurs outils sous forme de composants métier modulaires :
 
 - `pricing_intelligence`
 - `review_corpus`
@@ -225,10 +219,10 @@ Cette solution contient Plusieurs outils spécialisés sous forme de composants 
 
 Ces outils sont testables indépendamment et définissent les capacités
 structurées d'analyse de marché du système. Le runtime ADK actif est piloté par
-des agents : des agents spécialisés utilisent une recherche ancrée sur le web
-pour collecter des preuves et écrire des sorties structurées dans l'état de
+des agents : des agents utilisent une recherche ancrée sur le web
+pour récupérer des informations et écrire des sorties structurées dans l'état de
 session, tandis que la couche d'outils fournit une abstraction stable et
-déterministe pour les tests, la validation, et de futures intégrations avec des
+déterministe pour les tests, la validation, et de futures providers avec des
 fournisseurs de données plus structurés.
 
 Ce choix est intentionnel. Les agents portent l'orchestration et le contrôle
@@ -240,26 +234,25 @@ capacités : les agents coordonnent le workflow, et les outils définissent les
 fonctions spécialisées.
 
 Le runtime ADK actif est aujourd'hui orienté agents. Dans le chemin
-d'exécution en direct, les agents spécialisés utilisent `google_search` pour
+d'exécution en direct, les agents utilisent `google_search` pour
 chercher des preuves ancrées, tandis que la couche d'outils reste disponible
 comme couche modulaire de capacités pour les tests, la validation
-déterministe, et une future intégration avec des sources de données e-commerce
+heuristique, et une future intégration avec des sources de données e-commerce
 structurées.
 
-Le dépôt contient toujours des fonctions Python locales dans
+Le repository contient toujours des tools Python  dans
 `agents/ecommerce_agents/tools.py` ainsi que des providers alimentés par des
 fixtures dans `agents/ecommerce_agents/providers/mock.py`, mais ils ne
 constituent plus aujourd'hui le chemin principal d'exécution de l'application
 ADK. Le workflow en cours utilise des agents spécialisés capables de faire des
-recherches pour chercher des preuves en direct et stocker leurs sorties
-directement dans l'état de session.
+recherches pour chercher des preuves et stocker leurs sorties de manière structurée dans l'état de session.
 
-Ces outils locaux restent importants pour deux raisons :
+Ces outils restent importants pour deux raisons :
 
 - ils fournissent des structures heuristiques pour les tests unitaires et la
   validation locale à partir de fixtures
 - ils offrent un point d'extension propre si le projet ajoute plus tard des
-  collecteurs basés sur des API derrière des outils Python
+  providers basés sur des API
 
 ### Alternatives étudiées
 
@@ -269,10 +262,9 @@ Ces outils locaux restent importants pour deux raisons :
 - **Seulement des workflow agents** : insuffisant, car l'application a besoin
   d'un branchement explicite basé sur `research_scope` et sur les règles de
   clarification.
-- **Beaucoup plus d'agents spécialisés** : possible, mais inutile au-delà du
-  découpage actuel de la recherche en direct.
+- **Beaucoup plus d'agents spécialisés** : possible, mais inutile au-delà de la stratégie actuelle de la recherche.
 - **Recherche uniquement via fonctions-outils** : intéressant pour des
-  intégrations déterministes plus tard, mais ce n'est pas l'architecture active
+  ajouts de providers heuristiques plus tard, mais ce n'est pas l'architecture active
   du runtime aujourd'hui.
 
 ## Couverture des livrables
@@ -295,7 +287,7 @@ cette manière :
 Le code se concentre volontairement sur les étapes 1 à 3 de l'exercice. Les
 sections plus bas dans ce README pour les étapes 4 à 7 doivent être lues comme
 des recommandations de conception et de production, et non comme des
-affirmations indiquant que ces capacités sont déjà intégralement implémentées
+affirmations indiquant que ces capacités sont déjà 
 dans le code actuel.
 
 ## Composants de haut niveau
@@ -307,11 +299,11 @@ dans le code actuel.
 | `ClarificationAgent` | `LlmAgent` | Pose une seule question courte de suivi lorsque la demande n'est pas claire | clarification utilisateur |
 | `CompetitorDiscoveryAgent` | `LlmAgent` avec `google_search` | Trouve les concurrents les plus pertinents pour le produit résolu | `competitor_set` |
 | `ParallelMarketResearchAgent` | `ParallelAgent` de workflow | Exécute en concurrence la recherche sur les prix, les avis, le sentiment et les tendances | sorties de branches dans l'état de session |
-| `PricingIntelligenceAgent` | `LlmAgent` avec `google_search` | Recherche des signaux de prix en direct pour le produit principal et ses concurrents | `pricing_intelligence` |
+| `PricingIntelligenceAgent` | `LlmAgent` avec `google_search` | Recherche des signaux de prix actuels pour le produit principal et ses concurrents | `pricing_intelligence` |
 | `ReviewCorpusAgent` | `LlmAgent` avec `google_search` | Recherche des sources d'avis et de preuves liées au produit principal et aux concurrents | `review_corpus` |
-| `ReviewSentimentAgent` | `LlmAgent` avec `google_search` | Recherche les thèmes positifs, les irritants et les signaux de sentiment | `review_sentiment` |
+| `ReviewSentimentAgent` | `LlmAgent` avec `google_search` | Recherche les thèmes et les avis  sentiment  | `review_sentiment` |
 | `TrendSignalsAgent` | `LlmAgent` avec `google_search` | Recherche des signaux de demande et de tendance de catégorie | `trend_signals` |
-| `MarketAnalysisAgent` | `LlmAgent` | Synthétise l'état collecté en rapport final Markdown | rapport final en Markdown |
+| `MarketAnalysisAgent` | `LlmAgent` | Synthétise les informations précédentes en rapport final Markdown | rapport final en Markdown |
 
 Le nom d'application servi par ADK est `ecommerce_agents`, et `root_agent`
 exporte l'orchestrateur.
@@ -327,7 +319,7 @@ clés d'état de session les plus importantes sont :
 | `competitor_set` | `CompetitorDiscoveryAgent` | Liste structurée des concurrents utilisée par toutes les branches de recherche |
 | `pricing_intelligence` | `PricingIntelligenceAgent` | Preuves de prix en direct pour le produit et ses concurrents |
 | `review_corpus` | `ReviewCorpusAgent` | Preuves issues des avis, notes et volumes |
-| `review_sentiment` | `ReviewSentimentAgent` | Thèmes positifs, points de douleur et synthèse de sentiment |
+| `review_sentiment` | `ReviewSentimentAgent` | Thèmes et synthèse de sentiment |
 | `trend_signals` | `TrendSignalsAgent` | Signaux de demande de catégorie et tendances marché |
 | `final_report` | `MarketAnalysisAgent` | Rapport final Markdown utilisé pour la persistance durable et la sortie utilisateur |
 
@@ -336,7 +328,7 @@ léger une fois que le chemin d'analyse complet réussit. Les exécutions qui se
 limitent à une clarification ne sont pas persistées. L'enregistrement durable
 conserve les métadonnées de requête, le rapport final Markdown, un snapshot JSON
 des principales sorties d'état de session et toutes les URL sources qui peuvent
-être extraites de ce snapshot.
+être retrouvées. 
 
 Exemples représentatifs de formes d'état :
 
@@ -477,8 +469,7 @@ sequenceDiagram
 
 **Rôle**
 
-Transforme une demande utilisateur simple en un périmètre de recherche
-structuré.
+Depuis une demande utilisateur simple en déduit un périmètre de recherche structuré.
 
 **Ce qu'il fait**
 
@@ -541,7 +532,7 @@ périmètre produit et l'ensemble des concurrents sont stabilisés.
 Selon le modèle ADK `ParallelAgent`, les branches parallèles sont les plus
 utiles lorsque le travail est indépendant. C'est exactement le cas ici, car les
 signaux de prix, les preuves issues des avis, les signaux de sentiment et les
-signaux de tendance peuvent tous être collectés séparément après la découverte
+signaux de tendance peuvent tous être récupérés séparément après la découverte
 des concurrents.
 
 **Comportement ADK important**
@@ -568,18 +559,18 @@ final en Markdown.
 
 **Pourquoi la synthèse reste séparée**
 
-Cela permet de garder le rapport ancré sur des preuves déjà collectées et
-d'éviter de mélanger le comportement de recherche en direct avec l'étape finale
+Cela permet de garder le rapport ancré sur des preuves déjà récupérées et
+d'éviter de mélanger le comportement de recherche avec l'étape finale
 de reporting.
 
-## Stratégie de recherche en direct
+## Stratégie de recherche 
 
 Le runtime actuel utilise quatre branches de recherche spécialisées après la
 découverte des concurrents.
 
 ### Branche prix
 
-`PricingIntelligenceAgent` collecte des signaux de prix en direct pour le
+`PricingIntelligenceAgent` récupère des signaux de prix pour le
 produit principal et ses concurrents.
 
 Priorités :
@@ -590,7 +581,7 @@ Priorités :
 
 ### Branche preuves issues des avis
 
-`ReviewCorpusAgent` collecte des preuves issues des sources d'avis pour le
+`ReviewCorpusAgent` récupère des preuves issues des sources d'avis pour le
 produit principal et ses concurrents.
 
 Elle se concentre sur :
@@ -601,20 +592,20 @@ Elle se concentre sur :
 
 ### Branche sentiment
 
-`ReviewSentimentAgent` collecte les thèmes positifs, les irritants clients et
+`ReviewSentimentAgent` récupère les thèmes positifs, les irritants clients et
 les signaux globaux de sentiment.
 
 Cette branche est volontairement séparée de `ReviewCorpusAgent`. Dans le runtime
-actuel, le sentiment est collecté comme un flux de preuves de recherche en
+actuel, le sentiment est récupéré comme un flux de preuves de recherche en
 direct distinct plutôt que calculé à partir d'un corpus d'avis unique et
 normalisé.
 
 ### Branche tendance
 
-`TrendSignalsAgent` collecte des signaux de demande de catégorie et de tendance
+`TrendSignalsAgent` récupère des signaux de demande de catégorie et de tendance
 de marché.
 
-Elle se concentre sur :
+Entre autres :
 
 - le sens de la demande
 - la pression sur les prix
@@ -639,10 +630,10 @@ trois outils spécialisés :
 
 | Outil | Rôle | Usage actuel |
 | --- | --- | --- |
-| `pricing_intelligence` | Normalise les données de prix et d'offres par produit | Validation déterministe et futur runtime hybride |
-| `review_corpus` | Collecte les preuves issues des sources d'avis | Validation déterministe et futur runtime hybride |
-| `review_sentiment` | Extrait les thèmes positifs, points de douleur et polarité | Validation déterministe et futur runtime hybride |
-| `trend_signals` | Résume la demande de catégorie et la pression sur les prix | Validation déterministe et futur runtime hybride |
+| `pricing_intelligence` | Normalise les données de prix et d'offres par produit | Validation prédictible et futur runtime hybride |
+| `review_corpus` | Collecte les preuves issues des sources d'avis | Validation prédictible et futur runtime hybride |
+| `review_sentiment` | Extrait les thèmes positifs, points de douleur et polarité | Validation prédictible et futur runtime hybride |
+| `trend_signals` | Résume la demande de catégorie et la pression sur les prix | Validation prédictible et futur runtime hybride |
 
 Ces modules sont réels, testés et conçus dans un esprit production.
 
@@ -678,7 +669,7 @@ Analyze Dyson V15
 1. Le système résout `Dyson V15` en `Dyson V15 Detect`.
 2. Le système identifie la catégorie comme `cordless stick vacuum`.
 3. Le système découvre automatiquement des concurrents probables.
-4. L'étape de recherche parallèle collecte des signaux de prix, d'avis, de
+4. L'étape de recherche parallèle récupère des signaux de prix, d'avis, de
    sentiment et de tendance.
 5. L'agent final d'analyse synthétise ces éléments ancrés dans un seul rapport.
 
@@ -1022,7 +1013,7 @@ stockage casse, les analyses terminées sont perdues ou écrasées.
     données de marché aval.
 - `tests/test_mock_providers.py`
   - Vérifie les mock providers alimentés par fixtures.
-  - C'est pertinent car ils fournissent une validation locale déterministe sans
+  - C'est pertinent car ils fournissent une validation locale prédictible sans
     dépendre d'API externes.
 - `tests/test_storage.py`
   - Vérifie la création des snapshots et le comportement save/read en SQLite.
@@ -1313,7 +1304,7 @@ comparaison de prompts, le feedback utilisateur et l'évolution des capacités.
 
 J'utiliserais une boucle qualité à deux niveaux :
 
-- des vérifications déterministes sur la complétude de schéma, l'absence de
+- des vérifications prédictibles sur la complétude de schéma, l'absence de
   citations et la couverture des sections du rapport
 - une évaluation de type LLM-as-judge sur l'utilité stratégique, l'ancrage
   factuel, la clarté et la qualité des recommandations
@@ -1360,7 +1351,7 @@ direct parallèle est en place sont :
 2. ajouter des tests de bout en bout autour de la clarification, de la
    découverte des concurrents et de la synthèse
 3. décider quelles branches doivent rester orientées recherche et lesquelles
-   doivent basculer vers des collecteurs connectés à des API
+   doivent basculer vers des providers connectés à des API
 4. ajouter des scores explicites de fraîcheur et de confiance dans le rapport
    final
 5. garder la couche d'outils alimentée par fixtures alignée avec les sorties du
@@ -1377,7 +1368,7 @@ direct parallèle est en place sont :
   les suivis utilisateur plus propres et plus prévisibles.
 - La recherche parallèle améliore la latence, mais les branches ne partagent pas
   automatiquement leur raisonnement intermédiaire pendant l'exécution.
-- Le sentiment basé sur la recherche est flexible, mais moins déterministe qu'un
+- Le sentiment basé sur la recherche est flexible, mais moins prédictible qu'un
   sentiment calculé à partir d'un corpus d'avis unique et normalisé.
 - Garder des outils anciens et des mock providers aide les tests, mais crée une
   obligation de maintenance pour conserver l'alignement avec le runtime live.

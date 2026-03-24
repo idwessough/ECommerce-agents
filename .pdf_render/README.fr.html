@@ -60,7 +60,7 @@
 <li>collecter des signaux en direct de prix, d&#x27;avis, de sentiment et de tendance</li>
 <li>synthétiser un rapport final d&#x27;analyse de marché</li>
 </ul>
-<p>L&#x27;utilisateur ne doit pas avoir à expliquer comment fonctionne la découverte des concurrents ni comment la recherche doit être conduite. Le système ne doit poser une question complémentaire que lorsque la demande produit est réellement ambiguë.</p>
+<p>L&#x27;utilisateur ne doit pas avoir à expliquer comment fonctionne la découverte des concurrents ni comment la recherche doit être conduite. Le système ne doit poser une question complémentaire que lorsque la demande est réellement ambiguë.</p>
 <h2>Démarrage rapide</h2>
 <p>Pour lancer l&#x27;application sans chercher dans plusieurs fichiers :</p>
 <ol>
@@ -70,7 +70,7 @@
 </ol>
 <pre><code class="language-text">GOOGLE_API_KEY: GEMINI_API_KEY_HERE</code></pre>
 <p>par une clé Gemini valide.</p>
-<p>Important : cette ligne est déclarée une seule fois dans <code>x-app-common</code>, donc elle alimente à la fois l&#x27;interface web, l&#x27;API et le runner de tests. Les reviewers n&#x27;ont pas besoin de modifier un autre fichier pour démarrer.</p>
+<p>Important : cette ligne est déclarée une seule fois dans <code>x-app-common</code>, donc elle alimente à la fois l&#x27;interface web, l&#x27;API et le runner de tests.</p>
 <p>Ensuite lancez simplement :</p>
 <pre><code class="language-bash">docker compose --profile web up --build market-analysis-web</code></pre>
 <p>Puis ouvrez :</p>
@@ -93,7 +93,7 @@
 <li>une orchestration prévisible</li>
 <li>des transferts d&#x27;état explicites entre les étapes</li>
 <li>une facilité de test et d&#x27;inspection</li>
-<li>une extensibilité vers de futurs collecteurs connectés à des API</li>
+<li>une extensibilité vers de futurs providers connectés à des API</li>
 </ul>
 <h2>Expérience utilisateur</h2>
 <p>Le parcours utilisateur visé est volontairement minimal :</p>
@@ -118,7 +118,7 @@
 <h3>Décision</h3>
 <p>La solution recommandée actuellement est un petit système multi-agents ADK avec branchement explicite et une étape de recherche parallèle en direct.</p>
 <h3>Pourquoi cette architecture</h3>
-<p>L&#x27;implémentation actuelle suit les patterns ADK qui correspondent le mieux au problème :</p>
+<p>L&#x27;architecture actuelle suit les patterns ADK qui correspondent le mieux au business :</p>
 <ul>
 <li>un orchestrateur personnalisé basé sur <code>BaseAgent</code> pour le contrôle</li>
 </ul>
@@ -155,13 +155,13 @@
 <ul>
 <li>ce projet garde encore <code>google_search</code> isolé dans des agents spécialisés</li>
 </ul>
-<p>comme choix conservateur, même si les versions récentes d&#x27;ADK Python offrent davantage de flexibilité que les anciennes intégrations</p>
+<p>comme choix conservateur, même si les versions récentes d&#x27;ADK Python offrent davantage de flexibilité que les anciennes releases</p>
 <ul>
 <li>la documentation actuelle de l&#x27;API Gemini indique que Search grounding est</li>
 </ul>
-<p>supporté par Gemini 3.1 Pro Preview, c&#x27;est pourquoi le projet utilise par défaut <code>gemini-3.1-pro-preview</code> pour la recherche en direct ancrée sur le web</p>
+<p>supporté par Gemini 3.1 Pro Preview, c&#x27;est pourquoi le projet utilise par défaut <code>gemini-3.1-pro-preview</code> pour la recherche groundée sur le web</p>
 <h3>Pourquoi Google ADK plutôt qu&#x27;une approche plus simple</h3>
-<p>Le choix de Google ADK est intentionnel et va au-delà du simple fait d&#x27;utiliser un framework agentique. Le problème à résoudre n&#x27;est pas seulement d&#x27;appeler un modèle une fois : il faut chaîner plusieurs étapes, partager un état structuré entre elles, poser une clarification conditionnelle, lancer une recherche parallèle, puis exposer le même graphe à la fois en interface web et en API.</p>
+<p>Le choix de Google ADK est intentionnel et va au-delà du simple fait d&#x27;utiliser un framework agentique. Le projet n&#x27;est pas seulement d&#x27;appeler un modèle une fois : il faut chaîner plusieurs étapes, partager un état structuré entre elles, poser une clarification conditionnelle, lancer une recherche parallèle, puis exposer le même graphe à la fois en interface web et en API.</p>
 <p>Par rapport à une orchestration plus artisanale en Python ou via un simple serveur web, ADK réduit fortement le code de glue autour :</p>
 <ul>
 <li>du routage entre agents</li>
@@ -175,10 +175,10 @@
 <li>d&#x27;ajouter un nouvel agent spécialisé sans réécrire tout le pipeline</li>
 <li>de remplacer une branche de recherche par un outil ou une intégration API dédiée</li>
 <li>d&#x27;introduire plus tard du cache, une file de jobs, ou une exécution asynchrone</li>
-<li>de conserver une séparation claire entre orchestration, collecte de données et synthèse finale</li>
+<li>de conserver une séparation claire entre orchestration, récupération de données et synthèse finale</li>
 <li>d&#x27;observer le système au niveau des sessions, des événements et des sorties d&#x27;agents</li>
 </ul>
-<p>Autrement dit, ADK apporte ici une meilleure scalabilité fonctionnelle : le workflow peut croître en complexité sans devenir un enchaînement fragile de conditions et d&#x27;appels manuels. Pour la production, il faudra toujours compléter le dispositif par une base de données plus solide, du cache, du monitoring et éventuellement une exécution asynchrone, mais ADK fournit déjà une base d&#x27;orchestration plus propre et plus extensible que des alternatives plus minimalistes.</p>
+<p>Autrement dit, ADK apporte ici une meilleure scalabilité fonctionnelle : le workflow peut croître en complexité devenant un enchaînement solide et maintenable. Pour la production, il faudra toujours compléter le dispositif par une base de données plus solide, du cache, du monitoring et éventuellement une exécution asynchrone, mais ADK fournit déjà une base d&#x27;orchestration plus propre et plus extensible que des alternatives plus minimalistes.</p>
 <h3>Pattern d&#x27;orchestration recommandé</h3>
 <pre><code class="language-text">MarketAnalysisOrchestrator(
   ResearchScope
@@ -187,28 +187,28 @@
   -&gt; Parallel Market Research
   -&gt; Final Analysis
 )</code></pre>
-<h2>Couche d&#x27;outils spécialisée</h2>
-<p>Cette soumission implémente quatre outils spécialisés sous forme de composants métier modulaires :</p>
+<h2>Couche d&#x27;outils</h2>
+<p>Cette solution contient Plusieurs outils sous forme de composants métier modulaires :</p>
 <ul>
 <li><code>pricing_intelligence</code></li>
 <li><code>review_corpus</code></li>
 <li><code>review_sentiment</code></li>
 <li><code>trend_signals</code></li>
 </ul>
-<p>Ces outils sont testables indépendamment et définissent les capacités structurées d&#x27;analyse de marché du système. Le runtime ADK actif est piloté par des agents : des agents spécialisés utilisent une recherche ancrée sur le web pour collecter des preuves et écrire des sorties structurées dans l&#x27;état de session, tandis que la couche d&#x27;outils fournit une abstraction stable et déterministe pour les tests, la validation, et de futures intégrations avec des fournisseurs de données plus structurés.</p>
+<p>Ces outils sont testables indépendamment et définissent les capacités structurées d&#x27;analyse de marché du système. Le runtime ADK actif est piloté par des agents : des agents utilisent une recherche ancrée sur le web pour récupérer des informations et écrire des sorties structurées dans l&#x27;état de session, tandis que la couche d&#x27;outils fournit une abstraction stable et déterministe pour les tests, la validation, et de futures providers avec des fournisseurs de données plus structurés.</p>
 <p>Ce choix est intentionnel. Les agents portent l&#x27;orchestration et le contrôle de bout en bout du workflow, tandis que les outils représentent les capacités spécialisées réutilisables exigées par le test.</p>
 <p>Autrement dit, l&#x27;architecture sépare l&#x27;orchestration de l&#x27;implémentation des capacités : les agents coordonnent le workflow, et les outils définissent les fonctions spécialisées.</p>
-<p>Le runtime ADK actif est aujourd&#x27;hui orienté agents. Dans le chemin d&#x27;exécution en direct, les agents spécialisés utilisent <code>google_search</code> pour collecter des preuves ancrées, tandis que la couche d&#x27;outils reste disponible comme couche modulaire de capacités pour les tests, la validation déterministe, et une future intégration avec des sources de données e-commerce structurées.</p>
-<p>Le dépôt contient toujours des fonctions Python locales dans <code>agents/ecommerce_agents/tools.py</code> ainsi que des providers alimentés par des fixtures dans <code>agents/ecommerce_agents/providers/mock.py</code>, mais ils ne constituent plus aujourd&#x27;hui le chemin principal d&#x27;exécution de l&#x27;application ADK. Le workflow en cours utilise des agents spécialisés capables de faire des recherches pour collecter des preuves en direct et stocker leurs sorties directement dans l&#x27;état de session.</p>
-<p>Ces outils locaux restent importants pour deux raisons :</p>
+<p>Le runtime ADK actif est aujourd&#x27;hui orienté agents. Dans le chemin d&#x27;exécution en direct, les agents utilisent <code>google_search</code> pour chercher des preuves ancrées, tandis que la couche d&#x27;outils reste disponible comme couche modulaire de capacités pour les tests, la validation heuristique, et une future intégration avec des sources de données e-commerce structurées.</p>
+<p>Le repository contient toujours des tools Python dans <code>agents/ecommerce_agents/tools.py</code> ainsi que des providers alimentés par des fixtures dans <code>agents/ecommerce_agents/providers/mock.py</code>, mais ils ne constituent plus aujourd&#x27;hui le chemin principal d&#x27;exécution de l&#x27;application ADK. Le workflow en cours utilise des agents spécialisés capables de faire des recherches pour chercher des preuves et stocker leurs sorties de manière structurée dans l&#x27;état de session.</p>
+<p>Ces outils restent importants pour deux raisons :</p>
 <ul>
-<li>ils fournissent des structures déterministes pour les tests unitaires et la</li>
+<li>ils fournissent des structures heuristiques pour les tests unitaires et la</li>
 </ul>
 <p>validation locale à partir de fixtures</p>
 <ul>
 <li>ils offrent un point d&#x27;extension propre si le projet ajoute plus tard des</li>
 </ul>
-<p>collecteurs basés sur des API derrière des outils Python</p>
+<p>providers basés sur des API</p>
 <h3>Alternatives étudiées</h3>
 <ul>
 <li><strong>Agent unique</strong> : plus simple en apparence, mais moins bon pour contrôler la</li>
@@ -221,11 +221,11 @@
 <ul>
 <li><strong>Beaucoup plus d&#x27;agents spécialisés</strong> : possible, mais inutile au-delà du</li>
 </ul>
-<p>découpage actuel de la recherche en direct.</p>
+<p>stratégie actuelle de la recherche.</p>
 <ul>
 <li><strong>Recherche uniquement via fonctions-outils</strong> : intéressant pour des</li>
 </ul>
-<p>intégrations déterministes plus tard, mais ce n&#x27;est pas l&#x27;architecture active du runtime aujourd&#x27;hui.</p>
+<p>ajouts de providers heuristiques plus tard, mais ce n&#x27;est pas l&#x27;architecture active du runtime aujourd&#x27;hui.</p>
 <h2>Couverture des livrables</h2>
 <p>Le test demande l&#x27;implémentation en code des étapes 1 à 3 et des réponses rédigées dans le README pour les étapes 4 à 7. Le dépôt actuel est structuré de cette manière :</p>
 <table>
@@ -617,17 +617,17 @@
 <table>
 <thead><tr><th>Outil</th><th>Rôle</th><th>Usage actuel</th></tr></thead>
 <tbody>
-<tr><td><code>pricing_intelligence</code></td><td>Normalise les données de prix et d&#x27;offres par produit</td><td>Validation déterministe et futur runtime hybride</td></tr>
-<tr><td><code>review_corpus</code></td><td>Collecte les preuves issues des sources d&#x27;avis</td><td>Validation déterministe et futur runtime hybride</td></tr>
-<tr><td><code>review_sentiment</code></td><td>Extrait les thèmes positifs, points de douleur et polarité</td><td>Validation déterministe et futur runtime hybride</td></tr>
-<tr><td><code>trend_signals</code></td><td>Résume la demande de catégorie et la pression sur les prix</td><td>Validation déterministe et futur runtime hybride</td></tr>
+<tr><td><code>pricing_intelligence</code></td><td>Normalise les données de prix et d&#x27;offres par produit</td><td>Validation prédictible et futur runtime hybride</td></tr>
+<tr><td><code>review_corpus</code></td><td>Collecte les preuves issues des sources d&#x27;avis</td><td>Validation prédictible et futur runtime hybride</td></tr>
+<tr><td><code>review_sentiment</code></td><td>Extrait les thèmes positifs, points de douleur et polarité</td><td>Validation prédictible et futur runtime hybride</td></tr>
+<tr><td><code>trend_signals</code></td><td>Résume la demande de catégorie et la pression sur les prix</td><td>Validation prédictible et futur runtime hybride</td></tr>
 </tbody>
 </table>
 <p>Ces modules sont réels, testés et conçus dans un esprit production.</p>
-<p>Les outils locaux ne constituent pas aujourd&#x27;hui le chemin principal d&#x27;exécution ADK, car le runtime actuel privilégie une orchestration multi-agents ancrée sur la recherche web afin de démontrer un comportement de recherche de marché de bout en bout dans Google ADK. La couche d&#x27;outils reste néanmoins implémentée et testée comme couche modulaire de capacités pour la validation déterministe et pour de futures intégrations avec des fournisseurs de données plus structurés.</p>
+<p>Les outils locaux ne constituent pas aujourd&#x27;hui le chemin principal d&#x27;exécution ADK, car le runtime actuel privilégie une orchestration multi-agents ancrée sur la recherche web afin de démontrer un comportement de recherche de marché de bout en bout dans Google ADK. La couche d&#x27;outils reste néanmoins implémentée et testée comme couche modulaire de capacités pour la validation prédictible et pour de futures intégrations avec des fournisseurs de données plus structurés.</p>
 <p>Leur rôle actuel est :</p>
 <ul>
-<li>les tests unitaires déterministes</li>
+<li>les tests unitaires prédictibles</li>
 <li>une validation locale stable des formes de données</li>
 <li>un socle pour une future couche hybride ou connectée à des API</li>
 </ul>
@@ -890,7 +890,7 @@ bash scripts/adk.sh test</code></pre>
 <ul>
 <li><code>tests/test_mock_providers.py</code></li>
 <li>Vérifie les mock providers alimentés par fixtures.</li>
-<li>C&#x27;est pertinent car ils fournissent une validation locale déterministe sans</li>
+<li>C&#x27;est pertinent car ils fournissent une validation locale prédictible sans</li>
 </ul>
 <p>dépendre d&#x27;API externes.</p>
 <ul>
@@ -1149,7 +1149,7 @@ bash scripts/adk.sh test</code></pre>
 <h3>Évaluation automatique de la qualité</h3>
 <p>J&#x27;utiliserais une boucle qualité à deux niveaux :</p>
 <ul>
-<li>des vérifications déterministes sur la complétude de schéma, l&#x27;absence de</li>
+<li>des vérifications prédictibles sur la complétude de schéma, l&#x27;absence de</li>
 </ul>
 <p>citations et la couverture des sections du rapport</p>
 <ul>
@@ -1198,7 +1198,7 @@ bash scripts/adk.sh test</code></pre>
 <ol>
 <li>décider quelles branches doivent rester orientées recherche et lesquelles</li>
 </ol>
-<p>doivent basculer vers des collecteurs connectés à des API</p>
+<p>doivent basculer vers des providers connectés à des API</p>
 <ol>
 <li>ajouter des scores explicites de fraîcheur et de confiance dans le rapport</li>
 </ol>
@@ -1225,7 +1225,7 @@ bash scripts/adk.sh test</code></pre>
 </ul>
 <p>automatiquement leur raisonnement intermédiaire pendant l&#x27;exécution.</p>
 <ul>
-<li>Le sentiment basé sur la recherche est flexible, mais moins déterministe qu&#x27;un</li>
+<li>Le sentiment basé sur la recherche est flexible, mais moins prédictible qu&#x27;un</li>
 </ul>
 <p>sentiment calculé à partir d&#x27;un corpus d&#x27;avis unique et normalisé.</p>
 <ul>

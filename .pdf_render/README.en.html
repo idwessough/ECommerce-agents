@@ -93,7 +93,7 @@
 <li>predictable orchestration</li>
 <li>explicit state handoffs between stages</li>
 <li>easy testing and inspection</li>
-<li>extensibility for future API-backed collectors</li>
+<li>extensibility for future API-backed providers</li>
 </ul>
 <h2>User Experience</h2>
 <p>The intended user flow is minimal:</p>
@@ -115,7 +115,7 @@
 <h3>Decision</h3>
 <p>The current recommended solution is a small ADK multi-agent system with explicit branching and a parallel live-research stage.</p>
 <h3>Why this architecture</h3>
-<p>The current implementation follows the ADK patterns that fit the problem best:</p>
+<p>The current architecture follows the ADK patterns that best fit the business goal:</p>
 <ul>
 <li>a custom <code>BaseAgent</code> orchestrator for conditional control flow</li>
 <li>a search-capable <code>ResearchScopeAgent</code> to resolve the request into structured state</li>
@@ -144,9 +144,9 @@
 <p>This is also the more scalable architectural choice for the future of the project. If the app evolves, it will be easier:</p>
 <ul>
 <li>to add a new specialist agent without rewriting the whole pipeline</li>
-<li>to replace one research branch with a dedicated tool or API-backed collector</li>
+<li>to replace one research branch with a dedicated tool or API-backed provider</li>
 <li>to introduce caching, job queues, or async execution later</li>
-<li>to preserve a clean separation between orchestration, data collection, and final synthesis</li>
+<li>to preserve a clean separation between orchestration, data acquisition, and final synthesis</li>
 <li>to observe behavior at the session, event, and agent-output level</li>
 </ul>
 <p>In other words, ADK gives the project better functional scalability: the workflow can grow in complexity without turning into a fragile chain of manual conditions and model calls. Production scalability will still require the usual supporting layers such as stronger persistence, caching, monitoring, and possibly async processing, but ADK already provides a cleaner and more extensible orchestration foundation than more minimal alternatives.</p>
@@ -174,7 +174,7 @@
 <p>Those local tools still matter for two reasons:</p>
 <ul>
 <li>they provide deterministic structures for unit tests and local fixture-based validation</li>
-<li>they offer a clean staging point if the project later adds API-backed collectors behind Python function tools</li>
+<li>they offer a clean staging point if the project later adds API-backed providers behind Python function tools</li>
 </ul>
 <h3>Alternatives considered</h3>
 <ul>
@@ -1099,7 +1099,7 @@ bash scripts/adk.sh test</code></pre>
 <ol>
 <li>Preserve source URLs and clearer citations from each research branch.</li>
 <li>Add end-to-end orchestration tests around clarification, competitor discovery, and synthesis.</li>
-<li>Decide which research branches should stay search-first and which should move to API-backed collectors.</li>
+<li>Decide which research branches should stay search-first and which should move to API-backed providers.</li>
 <li>Add freshness and confidence scoring that the final report can surface explicitly.</li>
 <li>Keep the fixture-backed tool layer aligned with the live runtime outputs or retire it if it stops adding value.</li>
 <li>Add an <code>Agents to UI</code> layer so the interface delivers clearer business signals, trade-offs, and recommendations and supports more comprehensive decision-making.</li>
